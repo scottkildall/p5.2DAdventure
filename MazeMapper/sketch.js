@@ -52,20 +52,28 @@ var collisionEY = [];
 var startMouseX;
 var startMouseY;
 
-function preload() {
-  images[0] = loadImage("assets/maze_test_wall.png");
+function preload(){
+  clickablesManager = new ClickableManager('data/clickableLayout.csv');
+  images[0] = loadImage("assets/atariMaze.png");
 }
+
 // Setup code goes here
 function setup() {
   createCanvas(1280, 720);
 
-  imageMode(CENTER);
-  rectMode(CORNER);
+  
+  // setup the clickables = this will allocate the array
+  clickables = clickablesManager.setup();
 
   gState = kStateWait;
 }
 
 function draw() {
+  push();
+  imageMode(CENTER);
+  rectMode(CORNER);
+
+
   if( gBlackBackground ) {
     background(0);
   } 
@@ -75,7 +83,13 @@ function draw() {
 
   noTint();
   if( gState === kStateFirstMouse ) {
-    tint(128);
+    tint(240);
+    noFill();
+    stroke("#FFFFFF");
+    strokeWeight(1);
+    
+    rectMode(CORNERS);
+    rect(startMouseX, startMouseY, mouseX, mouseY); 
   }
 
   image(images[0],width/2,height/2);
@@ -85,15 +99,24 @@ function draw() {
   if( gState === kStateWait && gDrawInstructions ) {
     drawInstructions();
   }
+
+  pop();
+
+  //clickablesManager.draw();
 }
 
 
 function keyPressed() {
-  if( key === 'i') {
-    gBlackBackground = !gBlackBackground;
-  }
   if( key === ' ') {
       gDrawInstructions = !gDrawInstructions;
+  }
+
+  else if( key === 'i') {
+    gBlackBackground = !gBlackBackground;
+  }
+  
+  else if( key === 's' ) {
+    saveCollisionRects();
   }
 }
 
@@ -135,11 +158,46 @@ function drawInstructions() {
 }
 
 function drawCollisionRects() {
-  //go thry collisionRects array and draw each
+
+  //go thru collisionRects array and draw each
+  for( let i = 0; i < collisionSX.length; i++ ) {
+    rectMode(CORNERS);
+    noFill();
+    stroke("#FFFFFF");
+    strokeWeight(1);
+    rect(collisionSX[i], collisionSY[i], collisionEX[i], collisionEY[i]);
+  }
 }
 
 function addCollisionRect(sx, sy, ex, ey) {
+  nextOffset = collisionSX.length;
 
+  collisionSX[nextOffset] = sx;
+  collisionSY[nextOffset] = sy;
+  collisionEX[nextOffset] = ex;
+  collisionEY[nextOffset] = ey;
+   
+}
+
+// forces a save into downloads directory
+function saveCollisionRects() {
+  table = new p5.Table();
+
+  table.addColumn('sx');
+  table.addColumn('sy');
+  table.addColumn('ex');
+  table.addColumn('ey');
+
+  for( let i = 0; i < collisionSX.length; i++ ) {
+    let newRow = table.addRow();
+    newRow.setNum('sx', collisionSX[i]);
+    newRow.setNum('sy', collisionSY[i]);
+    newRow.setNum('ex', collisionEX[i]);
+    newRow.setNum('ey', collisionEY[i]);
+  }
+  
+  // hard-code name for right now - eventually generate from PNG
+  saveTable(table, 'atariMaze.csv');
 }
 
 
