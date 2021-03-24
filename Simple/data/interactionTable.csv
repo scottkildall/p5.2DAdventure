@@ -1,0 +1,9 @@
+CurrentState,KeyTyped,MapDirection,NextState
+Atari,c,N,Corn
+Corn,a,S,Atari
+Corn,r,W,Rock
+Rock,c,E,Corn
+Rock,s,S,Scribbs
+Scribbs,r,N,Rock
+Scribbs,a,E,Atari
+Atari,s,W,Scribbs

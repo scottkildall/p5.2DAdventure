@@ -1,13 +1,14 @@
 /*******************************************************************************************************************
 //
-//  Class: State Machine
+//  p5.2DAdventure
 //  for P5.js
 //
 //  Written by Scott Kildall
+//
+//  Very Much in Progress
 *********************************************************************************************************************/
 
 class StateMachine {
-    // Store the duration and start the timer
     constructor() {
         this.states = [];
     }
@@ -24,8 +25,7 @@ class StateMachine {
 }
 
 
-
-class StateSimpleImage {
+class PNGRoom {
     constructor() {
         this.image = null;
         this.imagePath = null;
@@ -56,4 +56,9 @@ class StateSimpleImage {
     }
 }
 
-
+class MazeRoom extends PNGRoom {
+    constructor() {
+        this.image = null;
+        this.imagePath = null;
+    }
+}

@@ -6,6 +6,15 @@ www.kildall.com
 ## Overview
 Not yet usable, working on 1st stable build
 
+## ToDo
+** Finish maze mapper with collision rects + instructions
+
+** MazeRoom PNG
+
+** Interaction Tables from room to room
+
+** Avatar animation and navigation
+
 
 ## Adding it your index.html
 

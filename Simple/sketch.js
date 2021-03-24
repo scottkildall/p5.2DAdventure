@@ -31,7 +31,7 @@ const stateLosAngeles = 1;
 var states;
 var currentState = 0;
 
-var stateList = [StateSimpleImage, StateSimpleImage];
+var stateList = [PNGRoom, PNGRoom];
 var states = [];
 
 // Setup code goes here
@@ -47,8 +47,8 @@ function setup() {
 
   //print(states);
   //states = stateList;
-  states[stateBangkok].setup("assets/bangkok.jpg");
-  states[stateLosAngeles].setup("assets/los_angeles.jpg");
+  states[stateBangkok].setup("assets/atariMaze.png");
+  states[stateLosAngeles].setup("assets/scribbleMaze.png");
   states[stateBangkok].load();
   states[stateLosAngeles].load();
 
@@ -59,6 +59,7 @@ function setup() {
 
 // Draw code goes here
 function draw() {
+  background(255);
   states[currentState].draw();
 }
 
