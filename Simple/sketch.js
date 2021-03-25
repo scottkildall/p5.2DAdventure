@@ -22,35 +22,24 @@
 ***********************************************************************************/
 
 // Make global 
-var stateMachine;
+var adventureManager;
 
-// array of const
-const stateBangkok = 0;
-const stateLosAngeles = 1;
 
-var states;
-var currentState = 0;
-
-var stateList = [PNGRoom, PNGRoom];
-var states = [];
-
+function preload() {
+  adventureManager = new AdventureManager("data/adventureStates.csv", "data/interactionTable.csv");
+}
 // Setup code goes here
 function setup() {
   createCanvas(1280, 720);
 
-  // stateList[0] = new stateList[0];
-  // stateList[1] = new StateSimpleImage();
-  
-  stateMachine = new StateMachine();
-  states = stateMachine.register(stateList);
-
+  adventureManager.setup();
 
   //print(states);
   //states = stateList;
-  states[stateBangkok].setup("assets/atariMaze.png");
-  states[stateLosAngeles].setup("assets/scribbleMaze.png");
-  states[stateBangkok].load();
-  states[stateLosAngeles].load();
+  // states[stateBangkok].setup("assets/atariMaze.png");
+  // states[stateLosAngeles].setup("assets/scribbleMaze.png");
+  // states[stateBangkok].load();
+  // states[stateLosAngeles].load();
 
   textAlign(CENTER);
   textSize(24);
@@ -60,17 +49,21 @@ function setup() {
 // Draw code goes here
 function draw() {
   background(255);
-  states[currentState].draw();
+  // states[currentState].draw();
+
+  adventureManager.draw();
 }
 
-
-function mouseReleased() {
-
-  currentState++;
-  if( currentState === states.length ) {
-    currentState = 0;
-  }
+function keyPressed() {
+  adventureManager.keyPressed(key);
 }
+
+// function mouseReleased() {
+//   currentState++;
+//   if( currentState === states.length ) {
+//     currentState = 0;
+//   }
+// }
 
 //---------
 
