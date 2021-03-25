@@ -2,68 +2,45 @@
   Simple
   by Scott Kildall
 
-  Uses the p5.stateMachine.js class
+  Uses the p5.2DAdventure.js class 
 
-  Class allocation by class name works
-
-  Figure out the next steps:
-  (1) use a .csv file as an initializer? -- state name, background image, other data? --
-  (2) how to subclass our own states from these?
-  (3) how to move sprites into the state machine architecture?
-  (4) could we create a grad "maze" this way with separate rooms? these are PNG rooms?
-       ** allocate via a table
-       ** subclass different rooms, use a setup() function for SimpleImage...
-  (5) this ties into the interaction table...
+  To do:
+  ** cleanup p5.2DAdventure.js class + document it
+  ** add support for sprite movement
+  ** add mouse events, other interactions
+  ** finish MazeMapper
+  
 ------------------------------------------------------------------------------------
 	To use:
 	Add this line to the index.html
 
-  <script src="p5.stateMachine.js"></script>
+  <script src="p5.2DAdventure.js"></script>
 ***********************************************************************************/
 
 // Make global 
 var adventureManager;
 
-
+// Allocate Adventure Manager with states table and interaction tables
 function preload() {
   adventureManager = new AdventureManager("data/adventureStates.csv", "data/interactionTable.csv");
 }
-// Setup code goes here
+
+// Setup the adventure manager
 function setup() {
   createCanvas(1280, 720);
 
+  // This will load the images, go through state and interation tables, etc
   adventureManager.setup();
-
-  //print(states);
-  //states = stateList;
-  // states[stateBangkok].setup("assets/atariMaze.png");
-  // states[stateLosAngeles].setup("assets/scribbleMaze.png");
-  // states[stateBangkok].load();
-  // states[stateLosAngeles].load();
-
-  textAlign(CENTER);
-  textSize(24);
 }
 
-
-// Draw code goes here
+// Adventure manager handles it all!
 function draw() {
-  background(255);
-  // states[currentState].draw();
-
   adventureManager.draw();
 }
 
+// pass to adventure manager, this do the draw / undraw events
 function keyPressed() {
   adventureManager.keyPressed(key);
 }
 
-// function mouseReleased() {
-//   currentState++;
-//   if( currentState === states.length ) {
-//     currentState = 0;
-//   }
-// }
-
-//---------
-
+//-------------- SUBCLASSES / YOUR DRAW CODE CAN GO HERE ---------------//
