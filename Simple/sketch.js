@@ -6,9 +6,6 @@
 
   To do:
   ** cleanup p5.2DAdventure.js class + document it
-  ** add support for sprite movement: 
-    (1) move to corn has translation problems
-    (2) need to tie into interaction map and shift to that state, constrain walls
   ** add mouse events, other interactions
   ** finish MazeMapper
   
@@ -19,8 +16,10 @@
   <script src="p5.2DAdventure.js"></script>
 ***********************************************************************************/
 
-// Make global 
+// adventure manager global  
 var adventureManager;
+
+// p5.plau
 var playerSprite;
 var playerAnimation;
 
@@ -40,25 +39,19 @@ function setup() {
   playerSprite = createSprite(width/2, height/2, 80, 80);
   playerSprite.addAnimation('regular', 'assets/blueblob-01.png', 'assets/blueblob-05.png');
 
+  // use this to track movement from toom to room in adventureManager.draw()
   adventureManager.setPlayerSprite(playerSprite);
-
 }
 
 // Adventure manager handles it all!
 function draw() {
+  // draws background rooms and handles movement from one to another
   adventureManager.draw();
 
-  // responds to keydowns...
+  // responds to keydowns
   moveSprite();
-  
-///-- TO DO: add update() to adventure manager
-  // add collision check here...figure out best way...
-  //adventureManager.update()
-  // if( playerSprite.position.y < 0 ) {
-  //   // check for 
-  // }
 
-
+  // this is a function of p5.js, not of this sketch
   drawSprites();
 }
 
@@ -70,9 +63,13 @@ function keyPressed() {
     fullscreen(!fs);
   }
 
+  // dispatch key events for adventure manager to move from state to 
+  // state or do special actions - this can be disabled for NPC conversations
+  // or text entry
   adventureManager.keyPressed(key);  
 }
 
+//-------------- YOUR SPRITE MOVEMENT CODE HERE  ---------------//
 function moveSprite() {
   if(keyIsDown(RIGHT_ARROW))
     playerSprite.velocity.x = 10;
