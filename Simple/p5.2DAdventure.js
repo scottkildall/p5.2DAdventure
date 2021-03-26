@@ -17,6 +17,7 @@ class AdventureManager {
         this.states = [];
         this.statesTable = loadTable(statesFilename, 'csv', 'header');
         this.interactionTable = loadTable(interactionFilename, 'csv', 'header');
+        this.playerSprite = null;
     }
 
     // expects as .csv file with the format as outlined in the readme file
@@ -58,11 +59,16 @@ class AdventureManager {
         return this.hasValidStates;
     }
 
+    setPlayerSprite(s) {
+        this.playerSprite = s;
+    }
+
     draw() {
         if( !this.hasValidStates ) {
             background(128);
         }
         else {
+            this.checkPlayerSprite();
             background(this.backgroundColor);
             this.states[this.currentState].draw();
         }
@@ -117,6 +123,17 @@ class AdventureManager {
 
         // error!!
         return -1;
+    }
+
+    checkPlayerSprite() {
+        // some crude hard-coded nonsense
+        if(this.playerSprite.position.y < -1 ) {
+            this.playerSprite.position = height - 1;
+            this.changeState("Corn");
+        }
+        else if( this.playerSprite.position.x < -1 ) {
+            this.playerSprite.position.x = 0;
+        }
     }
 }
 
