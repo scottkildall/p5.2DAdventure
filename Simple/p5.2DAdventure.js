@@ -92,6 +92,8 @@ class AdventureManager {
       }
     }
 
+    // OPTIMIZATION: load all the state/interaction tables etc into an array with just
+    // those state entries for faster navigation
     // newState is a STRING
     changeState(newStateStr) {
         let newStateNum = this.getStateNumFromString(newStateStr);
@@ -126,13 +128,84 @@ class AdventureManager {
     }
 
     checkPlayerSprite() {
-        // some crude hard-coded nonsense
-        if(this.playerSprite.position.y < -1 ) {
-            this.playerSprite.position = height - 1;
-            this.changeState("Corn");
+        let direction = this.checkSpriteBounds();
+        
+        // empty string returned if we are in the room still
+        if( direction !== "") {
+            let stateChanged = false;
+
+            // go through each row, look for a match to the current state
+            for (let i = 0; i < this.interactionTable.getRowCount(); i++) {
+                 // the .name property of a function will convert function to string for comparison
+                if(this.currentStateName === this.interactionTable.getString(i, 'CurrentState') ) {
+                    // now, look for a match with the direction, converting it to a string
+                    if( direction === this.interactionTable.getString(i, 'MapDirection') ) {
+                        // if a match, set the drawFunction to the next state, eval() converts
+                        // string to function
+                        this.changeState(this.interactionTable.getString(i, 'NextState') );
+                        stateChanged = true; 
+
+                        this.adjustSpriteForRoom();
+                        break;
+                    }
+                }
+            }
+            
+            // state never changed, so we stick at edge
+            if( !stateChanged ) {
+                this.constrainSpriteBounds();
+            }
         }
-        else if( this.playerSprite.position.x < -1 ) {
+    }
+
+    // return direction we are out of bounds to match interaction map
+    checkSpriteBounds() {
+        if( this.playerSprite.position.x < -1 ) {
+            return "W";
+        }
+        else if( this.playerSprite.position.x > width ) {
+            return "E";
+        }
+        else if( this.playerSprite.position.y < -1 ) {
+            return "N";
+        }
+        else if( this.playerSprite.position.y > height ) {
+            return "S";
+        }
+
+        return "";
+    }
+
+    adjustSpriteForRoom() {
+        if( this.playerSprite.position.x < -1 ) {
+            playerSprite.position.x = width;
+        }
+        else if( this.playerSprite.position.x > width ) {
+            playerSprite.position.x = 0;
+        }
+        else if( this.playerSprite.position.y < -1 ) {
+            playerSprite.position.y = height;
+        }
+        else if( this.playerSprite.position.y > height ) {
+            playerSprite.position.y = 0;
+        }
+    }
+
+    // no room, constrain to edges
+    constrainSpriteBounds() {
+        if(this.playerSprite.position.x < -1 ) {
             this.playerSprite.position.x = 0;
+        }
+        else if(this.playerSprite.position.x > width+1 ) {
+            this.playerSprite.position.x = width;
+            //this.changeState("Maze_NE");
+        }
+        else if(this.playerSprite.position.y < -1 ) {
+            this.playerSprite.position.y = 0;
+        }
+        else if(this.playerSprite.position.y > height ) {
+            this.playerSprite.position.y = height;
+            //this.changeState("Maze_NE");
         }
     }
 }

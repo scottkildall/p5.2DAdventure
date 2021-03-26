@@ -41,6 +41,7 @@ function setup() {
   playerSprite.addAnimation('regular', 'assets/blueblob-01.png', 'assets/blueblob-05.png');
 
   adventureManager.setPlayerSprite(playerSprite);
+
 }
 
 // Adventure manager handles it all!
@@ -63,21 +64,27 @@ function draw() {
 
 // pass to adventure manager, this do the draw / undraw events
 function keyPressed() {
+  // toggle fullscreen mode
+  if( key === 'f') {
+    fs = fullscreen();
+    fullscreen(!fs);
+  }
+
   adventureManager.keyPressed(key);  
 }
 
 function moveSprite() {
   if(keyIsDown(RIGHT_ARROW))
-    playerSprite.velocity.x = 3;
+    playerSprite.velocity.x = 10;
   else if(keyIsDown(LEFT_ARROW))
-    playerSprite.velocity.x = -3;
+    playerSprite.velocity.x = -10;
   else
     playerSprite.velocity.x = 0;
 
   if(keyIsDown(DOWN_ARROW))
-    playerSprite.velocity.y = 3;
+    playerSprite.velocity.y = 10;
   else if(keyIsDown(UP_ARROW))
-    playerSprite.velocity.y = -3;
+    playerSprite.velocity.y = -10;
   else
     playerSprite.velocity.y = 0;
 }
