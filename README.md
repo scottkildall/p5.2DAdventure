@@ -4,16 +4,18 @@ www.kildall.com
 
 
 ## Overview
-Not yet usable, working on 1st stable build
+Simple is working.
 
 ## ToDo
+** Build in mouse events for a more complete no-inheritance maze
+
+** Add p5.clickables to this
+
+** Build in inheritance model with buttons
+
+** change state callbacks for transitions
+
 ** Finish maze mapper with collision rects + instructions
-
-** MazeRoom PNG
-
-** Interaction Tables from room to room
-
-** Avatar animation and navigation
 
 
 ## Adding it your index.html
@@ -27,9 +29,7 @@ Then, add the line below to the index.html file so that you can access it in you
 
 ## Functions
 
-###constructor()
-This will allocate the DebugScreen object
-
+To be documented...
 
 
 ## License
