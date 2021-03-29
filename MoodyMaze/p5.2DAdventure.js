@@ -109,6 +109,24 @@ class AdventureManager {
         this.mouseEvent("mouseReleased");
     }
 
+    // a clickable was pressed, look for it in the interaction table
+    clickablePressed(clickableName) {
+        // this will be = the clickable pressed
+         // go through each row, look for a match to the current state
+      for (let i = 0; i < this.interactionTable.getRowCount(); i++) {
+
+        // the .name property of a function will convert function to string for comparison
+        if(this.currentStateName === this.interactionTable.getString(i, 'CurrentState') ) {
+            // now, look for a match with the key typed, converting it to a string
+            if( this.interactionTable.getString(i, 'ClickableName') === clickableName ) {
+                // if a match, set the drawFunction to the next state, eval() converts
+                // string to function
+                this.changeState(this.interactionTable.getString(i, 'NextState') );
+                break;
+            }
+        }
+      }
+    }
 
  //-- PRIVATE FUNCTIONS: don't call these --//   
 
