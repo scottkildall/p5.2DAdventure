@@ -195,6 +195,9 @@ class ClickableManager {
 		this.allocatorTable = loadTable(allocatorFilename, 'csv', 'header');
 	}
 
+	getClickableArray() {
+		return this.clickableArray;
+	}
 	// expects as .csv file with the format as outlined in the readme file
 	setup() {
 		// For each row, allocate a clickable object
@@ -224,5 +227,15 @@ class ClickableManager {
 		for( let i = 0; i < this.clickableArray.length; i++ ) {
 			this.clickableArray[i].draw();
 		}
+	}
+
+	// given a column name and cell, will get the String value associated with it
+	getAttribute(rowNum,attStr) {
+		// return empty string if we are out of bounds
+		if( rowNum < 0 || rowNum >= this.allocatorTable.getRowCount()) {
+			return "";
+		}
+		
+		return this.allocatorTable.getString(rowNum, attStr);
 	}
  }

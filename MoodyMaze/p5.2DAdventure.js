@@ -9,7 +9,8 @@
 *********************************************************************************************************************/
 
 class AdventureManager {
-    constructor(statesFilename, interactionFilename) {
+    // Clickable layout table is an OPTIONAL parameter
+    constructor(statesFilename, interactionFilename, clickableLayoutFilename = null) {
         this.backgroundColor = color("#000000");
         this.currentState = 0;
         this.currentStateName = "";
@@ -17,7 +18,16 @@ class AdventureManager {
         this.states = [];
         this.statesTable = loadTable(statesFilename, 'csv', 'header');
         this.interactionTable = loadTable(interactionFilename, 'csv', 'header');
+        
+        if( clickableLayoutFilename === null ) {
+            this.clickableTable = null;
+        }
+        else {
+            this.clickableTable = loadTable(clickableLayoutFilename, 'csv', 'header');
+        }
+
         this.playerSprite = null;
+        this.clickableArray = null;
     }
 
     // expects as .csv file with the format as outlined in the readme file
@@ -53,12 +63,14 @@ class AdventureManager {
     
         if( validStateCount > 0 ) {
             this.hasValidStates = true;
-            this.states[0].load();
             this.currentStateName = this.statesTable.getString(0, 'StateName');
+            this.changeState(this.currentStateName,true);
         }
         else {
             this.hasValidStates = false;
         }
+
+        
 
         return this.hasValidStates;
     }
@@ -71,6 +83,11 @@ class AdventureManager {
     // from the p5.play class
     setPlayerSprite(s) {
         this.playerSprite = s;
+    }
+
+    // clickable manager for turning visibility on/off for buttons based on their states
+    setClickableManager(cm) {
+        this.clickableArray = cm.getClickableArray();
     }
 
     // call on every draw loop from the p5 sketch
@@ -150,19 +167,20 @@ class AdventureManager {
     
     // OPTIMIZATION: load all the state/interaction tables etc into an array with just
     // those state entries for faster navigation
-    // newState is a STRING
-    changeState(newStateStr) {
+    // newState is a STRING;
+    // 2nd param is a flag to bypass the comparison to currentStateNum, usually used at startup
+    changeState(newStateStr, bypassComparison = false) {
         let newStateNum = this.getStateNumFromString(newStateStr);
         print( "new state num = " + newStateNum);
         if( newStateNum === -1 ) {
             print("can't find stateNum from string: " + newStateStr);
 
         }
-        if( this.currentState === newStateNum ) {
+        if( bypassComparison === false && this.currentState === newStateNum ) {
             return;
         }
 
-        print("new state =" + newStateStr);
+        print("new state = " + newStateStr);
 
         this.states[this.currentState].unload();
         this.states[newStateNum].load();
@@ -170,6 +188,10 @@ class AdventureManager {
 
         // store new state name from states table
         this.currentStateName = newStateStr;
+
+        if( this.clickableArray !== null && this.clickableTable !== null ) {
+            this.changeButtonsVisibilityFromState(this.currentStateName);
+        }
     }
 
     getStateNumFromString(stateStr) {
@@ -263,6 +285,49 @@ class AdventureManager {
             this.playerSprite.position.y = height;
             //this.changeState("Maze_NE");
         }
+    }
+
+    // logic here is this (1) look at the clickables table to find the state name
+    // (2) look for a match in the clickables array, (3) turn visibility on/off accordingly
+    // EVERY clickable either has ONE state that corresponds to it or NO states
+    changeButtonsVisibilityFromState(newStateName) {
+        // this is the array where the button is VISIBLE for that state
+        // OPTIMIZATION: store this in setup somethwere
+        let clickableStateArray = this.clickableTable.getColumn('State');
+        for( let i = 0; i < clickableStateArray.length; i++ ) {
+            // if there is no column called 'State' then the array is a proper
+            // length, but each entry is undefined, just continue then
+            if( clickableStateArray[i] === undefined ) {
+                continue;
+            }
+
+            // if an empty string, then we are not binding this button to a state
+            if( clickableStateArray[i] ===  "" ) {
+
+            }
+
+            print( clickableStateArray[i] );
+            print(newStateName);
+            // Otherwise, we are binding, so turn button on/off accordingly
+            if( clickableStateArray[i] === newStateName ) {
+                this.clickableArray[i].visible = true;
+                print("set to visible");
+            }
+            else {
+                this.clickableArray[i].visible = false;   
+                print("set to hide");
+            }
+        }
+        
+        // (1) make sure column exists
+        // (2) go through table
+        // (3) for each entry, find index match in clickables
+/*
+               ID,Name,State,PNGFilename,Text,x,y,visible
+0,StartGame,Instructions,,Start Game,100,650,yes
+1,SelectAvatar,Instructions,,Select Avatar,300,650,yes
+2,Done,AvatarSelection,,Done,500,650,yes
+*/
     }
 }
 
