@@ -1,13 +1,8 @@
 /***********************************************************************************
-  Simple
+  MoodyMaze
   by Scott Kildall
 
   Uses the p5.2DAdventure.js class 
-
-  To do:
-  ** cleanup p5.2DAdventure.js class + document it
-  ** add mouse events, other interactions
-  ** finish MazeMapper
   
 ------------------------------------------------------------------------------------
 	To use:
@@ -19,15 +14,15 @@
 // adventure manager global  
 var adventureManager;
 
-// p5.pla7
+// p5.play
 var playerSprite;
 var playerAnimation;
 
-// Clcikables: the manager class
+// Clickables: the manager class
 var clickablesManager;    // the manager class
 var clickables;           // an array of clickable objects
 
-// indexes into the array (constants)
+// indexes into the clickable array (constants)
 const playGameIndex = 0;
 const chooseAvatarIndex = 1;
 const doneIndex = 2;
@@ -53,8 +48,7 @@ function setup() {
   // setup the clickables = this will allocate the array
   clickables = clickablesManager.setup();
 
- 
-    // create a sprite and add the 3 animations
+  // create a sprite and add the 3 animations
   playerSprite = createSprite(width/2, height/2, 80, 80);
   
   // use this to track movement from toom to room in adventureManager.draw()
@@ -85,7 +79,7 @@ function draw() {
       adventureManager.getStateName() !== "Instructions" &&  
       adventureManager.getStateName() !== "AvatarSelection" ) {
       
-      // responds to keydowns
+    // responds to keydowns
     moveSprite();
 
     // this is a function of p5.js, not of this sketch
@@ -257,9 +251,7 @@ class AvatarSelectionScreen extends PNGRoom {
       fill('#FF0000');
       ellipseMode(CENTER);
       circle(xStart+ (selectedAvatarAnimation*xDist), yPos + 65, 10 );
-
       pop();
-
     }
 
     drawSelectionTriangle() {
