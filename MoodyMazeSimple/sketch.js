@@ -76,7 +76,7 @@ function draw() {
     moveSprite();
 
     // this is a function of p5.js, not of this sketch
-    drawSprites();
+    drawSprite(playerSprite);
   } 
 }
 
