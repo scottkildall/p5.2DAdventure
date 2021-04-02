@@ -157,11 +157,10 @@ clickableButtonPressed = function() {
 // It is sublcassed from PNGRoom, which means all the loading, unloading and drawing of that
 // class can be used. We call super() to call the super class's function as needed
 class InstructionsScreen extends PNGRoom {
-  // Constructor gets calle with the new keyword, when upon constructor for the adventure manager in preload()
-  constructor() {
-    // call super-class constructor to initialize variables in PNGRoom
-    super();    
-
+  // preload is where we define OUR variables
+  // Best not to use constructor() functions for sublcasses of PNGRoom
+  // AdventureManager calls preload() one time, during startup
+  preload() {
     // These are out variables in the InstructionsScreen class
     this.textBoxWidth = (width/6)*4;
     this.textBoxHeight = (height/6)*4; 
