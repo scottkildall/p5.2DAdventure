@@ -186,8 +186,61 @@ class InstructionsScreen extends PNGRoom {
   }
 }
 
+// In the FeedMeRoom, you have a number of NPCs. We'll eventually make them
+// moving, but for now, they are static. If you run into the NPC, you
+// "die" and get teleported back to Start
 class FeedMeRoom extends PNGRoom {
+  // preload() gets called once upon startup
+  // We load ONE animation and create 20 NPCs
+  // 
   preload() {
-    print("preload feedme room!");
+     // load the animation just one time
+    this.NPCAnimation = loadAnimation('assets/NPCs/bubbly0001.png', 'assets/NPCs/bubbly0004.png');
+    
+    // this is a type from p5play, so we can do operations on all sprites
+    // at once
+    this.NPCgroup = new Group;
+
+    // change this number for more or less
+    this.numNPCs = 20;
+
+    // is an array of sprites, note we keep this array because
+    // later I will add movement to all of them
+    this.NPCSprites = [];
+
+    // this will place them randomly in the room
+    for( let i = 0; i < this.numNPCs; i++ ) {
+      // random x and random y poisiton for each sprite
+      let randX  = random(100, width-100);
+      let randY = random(100, height-100);
+
+      // create the sprite
+      this.NPCSprites[i] = createSprite( randX, randY, 80, 80);
+    
+      // add the animation to it (important to load the animation just one time)
+      this.NPCSprites[i].addAnimation('regular', this.NPCAnimation );
+
+      // add to the group
+      this.NPCgroup.add(this.NPCSprites[i]);
+    }
+  }
+
+  // pass draw function to superclass, then draw sprites, then check for overlap
+  draw() {
+    // PNG room draw
+    super.draw();
+
+    // draws all the sprites in the group
+    this.NPCgroup.draw();
+
+    // checks for overlap with ANY sprite in the group, if this happens
+    // our class's die() function gets called
+    playerSprite.overlap(this.NPCgroup, this.die);
+  }
+
+  // gets called when player sprite collides with an NPC
+  // teleport back to start
+  die() {
+    adventureManager.changeState("Start");
   }
 }

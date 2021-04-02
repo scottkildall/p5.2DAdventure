@@ -17,6 +17,9 @@ What this will allow you to do is to create complex graphics and offload the man
 ** Finish maze mapper with collision rects + instructions
 
 ** keycode navigation not yet implemented
+
+** documentation on creating sublcasses
+
 ## Errors in 2DAdventure
 
 Because 2DAdventure.js abstracts a lot of the class allocation and management, the errors may seem obscure. Here are some of the ones you might encounter (ignore the line numbers)
