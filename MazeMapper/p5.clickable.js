@@ -58,6 +58,7 @@ function getTextBounds(m, font, size) {
 function Clickable() {
 	this.id = 0;		// unique id number
 	this.name = "";		// string name for the clickable 
+	this.resizeImageFlag = false;	// flag for setting width and height to image after setImage since it is asynchronous
 	this.x = 0;			//X position of the clickable
 	this.y = 0;			//Y position of the clickable
 	this.width = 100;		//Width of the clickable
@@ -122,7 +123,19 @@ function Clickable() {
 		this.updateTextSize();
 	}
 
+	// Added at async
 	this.drawImage = function(){
+		// exit if image not yet loaded
+		if( this.image === null ) {
+			return;
+		}
+
+		// resize if flag has been triggered & image != 1
+		if( this.resizeImageFlag && this.image.width != 1 && this.image.height != 1) {
+			this.resize(this.image.width, this.image.height);
+			this.resizeImageFlag = false;
+		}
+
 		image(this.image, this.x, this.y, this.width, this.height);
 		if(this.tint && !this.noTint){
 			tint(this.tint)
@@ -134,9 +147,11 @@ function Clickable() {
 		}
 	}
 
+	// the image won't be resized yet to match the PNG, so we set a draw flag to do this
 	this.setImage = function (img) {
 		this.image = img;
 		this.text = "";
+		this.resizeImageFlag = true;
 	}
 
 	this.draw = function () {
@@ -180,6 +195,9 @@ class ClickableManager {
 		this.allocatorTable = loadTable(allocatorFilename, 'csv', 'header');
 	}
 
+	getClickableArray() {
+		return this.clickableArray;
+	}
 	// expects as .csv file with the format as outlined in the readme file
 	setup() {
 		// For each row, allocate a clickable object
@@ -195,7 +213,7 @@ class ClickableManager {
 			// IF YOU GET AN ERROR, you probably have the incorrect headers information on the CSV file
 			// especially check the case
 			this.clickableArray[i].id = parseInt(this.allocatorTable.getString(i, 'ID'));
-			this.clickableArray[i].name = parseInt(this.allocatorTable.getString(i, 'Name'));
+			this.clickableArray[i].name = this.allocatorTable.getString(i, 'Name');
 			this.clickableArray[i].x = parseInt(this.allocatorTable.getString(i, 'x'));
 			this.clickableArray[i].y = parseInt(this.allocatorTable.getString(i, 'y'));
 			this.clickableArray[i].text = this.allocatorTable.getString(i, 'Text')
@@ -209,5 +227,15 @@ class ClickableManager {
 		for( let i = 0; i < this.clickableArray.length; i++ ) {
 			this.clickableArray[i].draw();
 		}
+	}
+
+	// given a column name and cell, will get the String value associated with it
+	getAttribute(rowNum,attStr) {
+		// return empty string if we are out of bounds
+		if( rowNum < 0 || rowNum >= this.allocatorTable.getRowCount()) {
+			return "";
+		}
+		
+		return this.allocatorTable.getString(rowNum, attStr);
 	}
  }

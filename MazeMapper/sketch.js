@@ -57,23 +57,31 @@ var currentImage = null;
 
 function preload(){
   clickablesManager = new ClickableManager('data/clickableLayout.csv');
+  adventureManager = new AdventureManager('data/adventureStates.csv', 'data/interactionTable.csv', 'data/clickableLayout.csv');
+
 }
 
 // Setup code goes here
 function setup() {
   createCanvas(1280, 720);
-  
-  input = createFileInput(handleFile);
-  input.position(0, 0);
 
   // setup the clickables = this will allocate the array
   clickables = clickablesManager.setup();
+
+  // this is optional but will manage turning visibility of buttons on/off
+  // based on the state name in the clickableLayout
+  adventureManager.setClickableManager(clickablesManager);
+
+    // This will load the images, go through state and interation tables, etc
+  adventureManager.setup();
 
   gState = kStateWait;
 }
 
 function draw() {
   
+
+  adventureManager.draw();
 
   push();
 
@@ -100,9 +108,9 @@ function draw() {
   }
 
   // only draw current image if it is loaded
-  if( currentImage !== null ) {
-    image(currentImage,width/2,height/2);
-  }
+  // if( currentImage !== null ) {
+  //   image(currentImage,width/2,height/2);
+  // }
   
   drawCollisionRects();
 
@@ -115,19 +123,6 @@ function draw() {
   //clickablesManager.draw();
 }
 
-// callback handler for the DOM file
-function handleFile(file) {
-  //print(file);
-  if (file.type === 'image') {
-    imageFileName = file.name;    // save filename, we use this for later
-    img = createImg(file.data, '');
-    //img.hide();
-    //print(img);
-    currentImage = img;
-  } else {
-    currentImage = null;
-  }
-}
 
 function keyPressed() {
   if( key === ' ') {

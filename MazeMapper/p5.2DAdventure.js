@@ -208,6 +208,9 @@ class AdventureManager {
     }
 
     checkPlayerSprite() {
+        if( this.playerSprite === null ) {
+            return;
+        }
         let direction = this.checkSpriteBounds();
         
         // empty string returned if we are in the room still
