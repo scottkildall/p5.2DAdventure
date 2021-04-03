@@ -356,16 +356,6 @@ class AdventureManager {
                 print("set to hide");
             }
         }
-        
-        // (1) make sure column exists
-        // (2) go through table
-        // (3) for each entry, find index match in clickables
-/*
-               ID,Name,State,PNGFilename,Text,x,y,visible
-0,StartGame,Instructions,,Start Game,100,650,yes
-1,SelectAvatar,Instructions,,Select Avatar,300,650,yes
-2,Done,AvatarSelection,,Done,500,650,yes
-*/
     }
 }
 
@@ -409,9 +399,9 @@ class PNGRoom {
 class MazeRoom extends PNGRoom {
     constructor() {
         super();
-        this.image = null;
-        this.imagePath = null;
+        
 
+        this.collisionTable = null;
         this.collisionSX = [];
         this.collisionSY = [];
         this.collisionEX = [];
@@ -420,6 +410,22 @@ class MazeRoom extends PNGRoom {
 
     loadCollisionFile(collisionCSV) {
         print("collision filename = " + collisionCSV );
+
+        this.collisionTable = loadTable(collisionCSV, 'csv', 'header');
+    }
+
+    // load the image (super), load the arrays from the collision table
+    load() {
+        super.load();
+
+       // print( this.collisionTable.getRowCount() );
+
+        for( let i = 0; i < this.collisionTable.getRowCount(); i++ ) {
+            this.collisionSX[i] = this.collisionTable.getString(i, 'sx');
+            this.collisionSY[i] = this.collisionTable.getString(i, 'sy');
+            this.collisionEX[i] = this.collisionTable.getString(i, 'ex');
+            this.collisionEY[i] = this.collisionTable.getString(i, 'ey');
+        }
     }
 }
 

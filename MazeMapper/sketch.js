@@ -40,8 +40,6 @@ const kTextLineHeight = 16;
 const kDrawYInstructions = 100;
 const kDrawXInstructions = 20;
 
-
-
 // collision rects
 var collisionSX = [];
 var collisionSY = [];
@@ -137,26 +135,20 @@ function keyPressed() {
 
   // Next key, check for overflow
   if( key === 'n' ) {
-    newState = adventureManager.getCurrentStateNum() + 1;
-    if( newState >= adventureManager.getNumStates() ) {
-      newState = 0;
+    let newStateNum = adventureManager.getCurrentStateNum() + 1;
+    if( newStateNum >= adventureManager.getNumStates() ) {
+      newStateNum = 0;
     }
-    adventureManager.changeStateByNum(newState);
-    pngFilename = adventureManager.getPNGFilename();
-    className = adventureManager.getClassName();
-    clearCollisionRects();
+    updateStateNum(newStateNum);
   }
 
   // Prev key, check for underflow
   else if( key === 'p') {
-    newState = adventureManager.getCurrentStateNum() - 1;
-    if( newState < 0) {
-      newState = adventureManager.getNumStates()-1;
+    let newStateNum = adventureManager.getCurrentStateNum() - 1;
+    if( newStateNum < 0) {
+      newStateNum = adventureManager.getNumStates()-1;
     }
-    adventureManager.changeStateByNum(newState);
-    pngFilename = adventureManager.getPNGFilename();
-    className = adventureManager.getClassName();
-    clearCollisionRects();
+    updateStateNum(newStateNum);
   }
 
   else if( key === 'i') {
@@ -255,6 +247,21 @@ function saveCollisionRects() {
   let csvFilename = pngFilename.substr(0, pos < 0 ? pngFilename.length : pos) + "_cl" + ".csv";
 
   saveTable(table, csvFilename);
+}
+
+function updateStateNum(newStateNum) {
+  adventureManager.changeStateByNum(newStateNum);
+  pngFilename = adventureManager.getPNGFilename();
+  className = adventureManager.getClassName();
+  clearCollisionRects();
+
+  if( className === "MazeRoom") {
+    mazeRoomObj = adventureManager.states[adventureManager.getCurrentStateNum()];
+    collisionSX = mazeRoomObj.collisionSX;
+    collisionSY = mazeRoomObj.collisionSY;
+    collisionEX = mazeRoomObj.collisionEX;
+    collisionEY = mazeRoomObj.collisionEY;
+  }
 }
 
 // makes null arrays of the 4 points
