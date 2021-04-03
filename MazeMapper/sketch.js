@@ -40,8 +40,7 @@ const kTextLineHeight = 16;
 const kDrawYInstructions = 100;
 const kDrawXInstructions = 20;
 
-// array of images/filenames (to be developed...)
-var images = [];
+
 
 // collision rects
 var collisionSX = [];
@@ -52,15 +51,17 @@ var collisionEY = [];
 var startMouseX;
 var startMouseY;
 
+// for DOM input button
+var imageFileName = "";
+var currentImage = null;
+
 function preload(){
   clickablesManager = new ClickableManager('data/clickableLayout.csv');
-  images[0] = loadImage("assets/atariMaze.png");
 }
 
 // Setup code goes here
 function setup() {
   createCanvas(1280, 720);
-
   
   input = createFileInput(handleFile);
   input.position(0, 0);
@@ -69,12 +70,13 @@ function setup() {
   clickables = clickablesManager.setup();
 
   gState = kStateWait;
-
-
 }
 
 function draw() {
+  
+
   push();
+
   imageMode(CENTER);
   rectMode(CORNER);
 
@@ -97,8 +99,11 @@ function draw() {
     rect(startMouseX, startMouseY, mouseX, mouseY); 
   }
 
-  image(images[0],width/2,height/2);
-
+  // only draw current image if it is loaded
+  if( currentImage !== null ) {
+    image(currentImage,width/2,height/2);
+  }
+  
   drawCollisionRects();
 
   if( gState === kStateWait && gDrawInstructions ) {
@@ -110,17 +115,17 @@ function draw() {
   //clickablesManager.draw();
 }
 
-
+// callback handler for the DOM file
 function handleFile(file) {
-  print(file);
+  //print(file);
   if (file.type === 'image') {
-    print(file.name);
+    imageFileName = file.name;    // save filename, we use this for later
     img = createImg(file.data, '');
-    img.hide();
-    print(img);
-    images[0] = img;
+    //img.hide();
+    //print(img);
+    currentImage = img;
   } else {
-    img = null;
+    currentImage = null;
   }
 }
 
@@ -139,6 +144,11 @@ function keyPressed() {
 }
 
 function mouseReleased() {
+  // no interaction if file is current displayed
+  if( currentImage === null ) {
+    return;
+  }
+
   if( gState === kStateWait ) {
     startMouseX = mouseX;
     startMouseY = mouseY;
