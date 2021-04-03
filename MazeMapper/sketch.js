@@ -62,10 +62,15 @@ function setup() {
   createCanvas(1280, 720);
 
   
+  input = createFileInput(handleFile);
+  input.position(0, 0);
+
   // setup the clickables = this will allocate the array
   clickables = clickablesManager.setup();
 
   gState = kStateWait;
+
+
 }
 
 function draw() {
@@ -105,6 +110,19 @@ function draw() {
   //clickablesManager.draw();
 }
 
+
+function handleFile(file) {
+  print(file);
+  if (file.type === 'image') {
+    print(file.name);
+    img = createImg(file.data, '');
+    img.hide();
+    print(img);
+    images[0] = img;
+  } else {
+    img = null;
+  }
+}
 
 function keyPressed() {
   if( key === ' ') {
