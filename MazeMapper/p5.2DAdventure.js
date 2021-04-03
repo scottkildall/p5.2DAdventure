@@ -49,7 +49,12 @@ class AdventureManager {
             // All classes (for now) have a PNGFilename, could add a blank room
             this.states[validStateCount].setup(this.statesTable.getString(i, 'PNGFilename'));
 
-             this.states[validStateCount].preload();
+            // check to see if className is MazeRoom, and we add collision file, if so
+            if( className === "MazeRoom") {
+                print("loading maze room");
+                this.states[validStateCount].loadCollisionFile(this.statesTable.getString(i, 'CollisionFilename'));
+            }
+            this.states[validStateCount].preload();
 
 /*
             if( className === "PNGRoom" ) {
@@ -173,7 +178,12 @@ class AdventureManager {
     // 2nd param is a flag to bypass the comparison to currentStateNum, usually used at startup
     changeState(newStateStr, bypassComparison = false) {
         let newStateNum = this.getStateNumFromString(newStateStr);
-        print( "new state num = " + newStateNum);
+        this.changeStateByNum(newStateNum, bypassComparison);
+    }
+
+    // default is by string
+    changeStateByNum(newStateNum, bypassComparison = false) {
+        print( "passed new state num = " + newStateNum);
         if( newStateNum === -1 ) {
             print("can't find stateNum from string: " + newStateStr);
 
@@ -182,18 +192,26 @@ class AdventureManager {
             return;
         }
 
-        print("new state = " + newStateStr);
+        print("set new state = " + newStateNum);
 
         this.states[this.currentState].unload();
         this.states[newStateNum].load();
         this.currentState = newStateNum;
 
         // store new state name from states table
-        this.currentStateName = newStateStr;
+        this.currentStateName = this.getStateStrFromNum(newStateNum);
 
         if( this.clickableArray !== null && this.clickableTable !== null ) {
             this.changeButtonsVisibilityFromState(this.currentStateName);
         }
+    }
+
+    getNumStates() {
+        return this.statesTable.getRowCount();
+    }
+
+    getCurrentStateNum() {
+        return this.currentState;
     }
 
     getStateNumFromString(stateStr) {
@@ -205,6 +223,15 @@ class AdventureManager {
 
         // error!!
         return -1;
+    }
+
+    getStateStrFromNum(stateNum) {
+        return this.statesTable.getString(stateNum, 'StateName');
+    }
+
+    // returns class name of current state
+    getClassName() {
+        return this.statesTable.getString(this.currentState, 'ClassName');
     }
 
     checkPlayerSprite() {
@@ -290,6 +317,12 @@ class AdventureManager {
             this.playerSprite.position.y = height;
             //this.changeState("Maze_NE");
         }
+    }
+
+    // returns the "short" filename (no precesing directory for the current state)
+    getPNGFilename() {
+        let longFilename = this.statesTable.getString(this.currentState, 'PNGFilename');
+        return longFilename.substring(longFilename.lastIndexOf('/')+1);
     }
 
     // logic here is this (1) look at the clickables table to find the state name
@@ -378,6 +411,15 @@ class MazeRoom extends PNGRoom {
         super();
         this.image = null;
         this.imagePath = null;
+
+        this.collisionSX = [];
+        this.collisionSY = [];
+        this.collisionEX = [];
+        this.collisionEY = [];
+    }
+
+    loadCollisionFile(collisionCSV) {
+        print("collision filename = " + collisionCSV );
     }
 }
 

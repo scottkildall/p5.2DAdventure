@@ -51,9 +51,11 @@ var collisionEY = [];
 var startMouseX;
 var startMouseY;
 
-// for DOM input button
-var imageFileName = "";
-var currentImage = null;
+// current png filename
+var pngFilename;
+
+// current classname
+var className;
 
 function preload(){
   clickablesManager = new ClickableManager('data/clickableLayout.csv');
@@ -75,30 +77,39 @@ function setup() {
     // This will load the images, go through state and interation tables, etc
   adventureManager.setup();
 
+  pngFilename = adventureManager.getPNGFilename();
+  className = adventureManager.getClassName();
+
   gState = kStateWait;
 }
 
 function draw() {
-  
+  if( gBlackBackground ) {
+     background(0);
+  } 
+  else {
+     background(255);
+  }
+
+  if( gState === kStateFirstMouse ) {
+    tint(240);
+  }
+  else {
+    noTint();
+  }
 
   adventureManager.draw();
 
   push();
 
-  imageMode(CENTER);
+  // imageMode(CENTER);
+  
   rectMode(CORNER);
+  
 
-
-  if( gBlackBackground ) {
-    background(0);
-  } 
-  else {
-    background(255);
-  }
-
-  noTint();
+  //noTint();
   if( gState === kStateFirstMouse ) {
-    tint(240);
+    //tint(240);
     noFill();
     stroke("#FFFFFF");
     strokeWeight(1);
@@ -106,11 +117,6 @@ function draw() {
     rectMode(CORNERS);
     rect(startMouseX, startMouseY, mouseX, mouseY); 
   }
-
-  // only draw current image if it is loaded
-  // if( currentImage !== null ) {
-  //   image(currentImage,width/2,height/2);
-  // }
   
   drawCollisionRects();
 
@@ -129,20 +135,42 @@ function keyPressed() {
       gDrawInstructions = !gDrawInstructions;
   }
 
+  // Next key, check for overflow
+  if( key === 'n' ) {
+    newState = adventureManager.getCurrentStateNum() + 1;
+    if( newState >= adventureManager.getNumStates() ) {
+      newState = 0;
+    }
+    adventureManager.changeStateByNum(newState);
+    pngFilename = adventureManager.getPNGFilename();
+    className = adventureManager.getClassName();
+    clearCollisionRects();
+  }
+
+  // Prev key, check for underflow
+  else if( key === 'p') {
+    newState = adventureManager.getCurrentStateNum() - 1;
+    if( newState < 0) {
+      newState = adventureManager.getNumStates()-1;
+    }
+    adventureManager.changeStateByNum(newState);
+    pngFilename = adventureManager.getPNGFilename();
+    className = adventureManager.getClassName();
+    clearCollisionRects();
+  }
+
   else if( key === 'i') {
     gBlackBackground = !gBlackBackground;
   }
-  
+
+  // saves to your folder
   else if( key === 's' ) {
     saveCollisionRects();
   }
 }
 
 function mouseReleased() {
-  // no interaction if file is current displayed
-  if( currentImage === null ) {
-    return;
-  }
+  // XXX: do check for no states
 
   if( gState === kStateWait ) {
     startMouseX = mouseX;
@@ -172,13 +200,16 @@ function drawInstructions() {
     fill(0);
   }
 
+
   text( "SPACE to toggle instructions", kDrawXInstructions, kDrawYInstructions);
-  text( "Type [i] to invert background", kDrawXInstructions, kDrawYInstructions+kTextLineHeight);
-  text( "Left/Right arrows to select rect", kDrawXInstructions, kDrawYInstructions+kTextLineHeight*2);
-  text( "Type [x] to delete rect", kDrawXInstructions, kDrawYInstructions+kTextLineHeight*3);
-  text( "Type [s] to save collision rects", kDrawXInstructions, kDrawYInstructions+kTextLineHeight*4);
-  text( "Type [l] to load collision rects", kDrawXInstructions, kDrawYInstructions+kTextLineHeight*5);
-}
+  text( "Current file = " + pngFilename + "  |  ClassName = " + className, kDrawXInstructions, kDrawYInstructions+kTextLineHeight);
+  text( "[n] for next room | [p] for previous room", kDrawXInstructions, kDrawYInstructions+kTextLineHeight*2);
+  
+  text( "Type [i] to invert background", kDrawXInstructions, kDrawYInstructions+kTextLineHeight*3);
+  text( "Left/Right arrows to select rect", kDrawXInstructions, kDrawYInstructions+kTextLineHeight*4);
+  text( "Type [x] to delete rect", kDrawXInstructions, kDrawYInstructions+kTextLineHeight*5);
+  text( "Type [s] to save collision rects", kDrawXInstructions, kDrawYInstructions+kTextLineHeight*6);
+ }
 
 function drawCollisionRects() {
 
@@ -219,8 +250,17 @@ function saveCollisionRects() {
     newRow.setNum('ey', collisionEY[i]);
   }
   
-  // hard-code name for right now - eventually generate from PNG
-  saveTable(table, 'atariMaze.csv');
+  // converts .png or any file to .csv
+  let pos = pngFilename.lastIndexOf(".");
+  let csvFilename = pngFilename.substr(0, pos < 0 ? pngFilename.length : pos) + "_cl" + ".csv";
+
+  saveTable(table, csvFilename);
 }
 
-
+// makes null arrays of the 4 points
+function clearCollisionRects() {
+  collisionSX = [];
+  collisionSY = [];
+  collisionEX = [];
+  collisionEY = [];
+}

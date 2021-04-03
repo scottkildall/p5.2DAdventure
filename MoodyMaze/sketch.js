@@ -30,6 +30,8 @@ const doneIndex = 2;
 var avatarAnimations = [];
 var selectedAvatarAnimation = 0;  // default to zero
 
+
+
 // Allocate Adventure Manager with states table and interaction tables
 function preload() {
   clickablesManager = new ClickableManager('data/clickableLayout.csv');
