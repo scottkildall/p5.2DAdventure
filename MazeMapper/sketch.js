@@ -55,6 +55,10 @@ var pngFilename;
 // current classname
 var className;
 
+// you can toggle this display
+var showPlayerSprite = false;
+var playerSprite = null;
+
 function preload(){
   clickablesManager = new ClickableManager('data/clickableLayout.csv');
   adventureManager = new AdventureManager('data/adventureStates.csv', 'data/interactionTable.csv', 'data/clickableLayout.csv');
@@ -68,9 +72,21 @@ function setup() {
   // setup the clickables = this will allocate the array
   clickables = clickablesManager.setup();
 
+  // create a sprite and add the 3 animations
+  playerSprite = createSprite(width/2, height/2, 80, 80);
+
+  // every animation needs a descriptor, since we aren't switching animations, this string value doesn't matter
+  playerSprite.addAnimation('regular', loadAnimation('assets/avatars/bubbly0001.png', 'assets/avatars/bubbly0004.png'));
+  
+
+
   // this is optional but will manage turning visibility of buttons on/off
   // based on the state name in the clickableLayout
   adventureManager.setClickableManager(clickablesManager);
+
+  
+  // use this to track movement from toom to room in adventureManager.draw()
+  adventureManager.setPlayerSprite(playerSprite);
 
     // This will load the images, go through state and interation tables, etc
   adventureManager.setup();
@@ -96,6 +112,9 @@ function draw() {
     noTint();
   }
 
+  if( showPlayerSprite ) {
+    moveSprite();
+  }
   adventureManager.draw();
 
   push();
@@ -123,6 +142,12 @@ function draw() {
   }
 
   pop();
+
+
+  // this is a function of p5.js, not of this sketch
+  if( showPlayerSprite ) {
+    drawSprite(playerSprite);
+  }
 
   //clickablesManager.draw();
 }
@@ -158,6 +183,11 @@ function keyPressed() {
   // saves to your folder
   else if( key === 's' ) {
     saveCollisionRects();
+  }
+
+  // saves to your folder
+  else if( key === 'a' ) {
+    showPlayerSprite = !showPlayerSprite;
   }
 }
 
@@ -201,6 +231,7 @@ function drawInstructions() {
   text( "Left/Right arrows to select rect", kDrawXInstructions, kDrawYInstructions+kTextLineHeight*4);
   text( "Type [x] to delete rect", kDrawXInstructions, kDrawYInstructions+kTextLineHeight*5);
   text( "Type [s] to save collision rects", kDrawXInstructions, kDrawYInstructions+kTextLineHeight*6);
+  text( "Type [a] to draw player sprite", kDrawXInstructions, kDrawYInstructions+kTextLineHeight*7);
  }
 
 function drawCollisionRects() {
@@ -271,4 +302,20 @@ function clearCollisionRects() {
   collisionSY = [];
   collisionEX = [];
   collisionEY = [];
+}
+
+function moveSprite() {
+  if(keyIsDown(RIGHT_ARROW))
+    playerSprite.velocity.x = 10;
+  else if(keyIsDown(LEFT_ARROW))
+    playerSprite.velocity.x = -10;
+  else
+    playerSprite.velocity.x = 0;
+
+  if(keyIsDown(DOWN_ARROW))
+    playerSprite.velocity.y = 10;
+  else if(keyIsDown(UP_ARROW))
+    playerSprite.velocity.y = -10;
+  else
+    playerSprite.velocity.y = 0;
 }
