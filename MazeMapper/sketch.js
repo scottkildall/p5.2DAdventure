@@ -255,13 +255,14 @@ function updateStateNum(newStateNum) {
   className = adventureManager.getClassName();
   clearCollisionRects();
 
-  if( className === "MazeRoom") {
-    mazeRoomObj = adventureManager.states[adventureManager.getCurrentStateNum()];
-    collisionSX = mazeRoomObj.collisionSX;
-    collisionSY = mazeRoomObj.collisionSY;
-    collisionEX = mazeRoomObj.collisionEX;
-    collisionEY = mazeRoomObj.collisionEY;
-  }
+  roomObj = adventureManager.states[adventureManager.getCurrentStateNum()];
+  collisionSX = roomObj.collisionSX;
+  collisionSY = roomObj.collisionSY;
+  collisionEX = roomObj.collisionEX;
+  collisionEY = roomObj.collisionEY;
+
+
+  print("collisionSX = " + collisionSX);
 }
 
 // makes null arrays of the 4 points

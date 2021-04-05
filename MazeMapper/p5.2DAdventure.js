@@ -47,8 +47,8 @@ class AdventureManager {
             this.states[validStateCount] = eval("new " + className);
             
             // All classes (for now) have a PNGFilename, could add a blank room
-            this.states[validStateCount].setup(this.statesTable.getString(i, 'PNGFilename'));
-
+            this.states[validStateCount].setup( this.statesTable.getString(i, 'PNGFilename'),
+                                                this.statesTable.getString(i, 'CollisionFilename'));
             // check to see if className is MazeRoom, and we add collision file, if so
             if( className === "MazeRoom") {
                 print("loading maze room");
@@ -362,14 +362,32 @@ class AdventureManager {
 
 class PNGRoom {
     constructor() {
-        this.image = null;
+        // Image stuff
         this.imagePath = null;
+        this.image = null;
+
+        // collision stuff
+        this.collisionTable = null;
+        this.collisionSX = [];
+        this.collisionSY = [];
+        this.collisionEX = [];
+        this.collisionEY = [];
+
+        // flag for first-time load for collision table proper loading
+        this.loaded = false;
     }
 
-    setup(_imagePath) {
-        this.imagePath = String(_imagePath);
-    }
+    // filepath to PNG is 1st variable
+    // file to collision CSV is 2nd variable (may be empty string)
+    setup(_imagePath, _collisionPath = "") {
+        this.imagePath = _imagePath;
 
+        if( _collisionPath !== "" ) {
+            this.collisionTable = loadTable(_collisionPath, 'csv', 'header');
+            this.output("collision table = " + _collisionPath, " load " + this.collisionTable);
+        }
+    }
+    
     // empty, sublcasses can override
     preload() {
        
@@ -377,6 +395,24 @@ class PNGRoom {
 
     load() {
         this.image = loadImage(this.imagePath);
+
+        // this loads the collision table, we use the flag b/c loadTable needs
+        // time to load the data and won't work properly for a few cycles
+        if( this.loaded === false ) {
+
+
+            if( this.collisionTable !== null) { 
+                this.output("collision table row count = " + this.collisionTable.getRowCount());
+                for( let i = 0; i < this.collisionTable.getRowCount(); i++ ) {
+                    this.collisionSX[i] = this.collisionTable.getString(i, 'sx');
+                    this.collisionSY[i] = this.collisionTable.getString(i, 'sy');
+                    this.collisionEX[i] = this.collisionTable.getString(i, 'ex');
+                    this.collisionEY[i] = this.collisionTable.getString(i, 'ey');
+                }
+            }
+
+            this.loaded = true; 
+        }
     }
 
     unload() {
@@ -394,39 +430,13 @@ class PNGRoom {
         image(this.image,width/2,height/2);
         pop();
     }
-}
 
-class MazeRoom extends PNGRoom {
-    constructor() {
-        super();
-        
-
-        this.collisionTable = null;
-        this.collisionSX = [];
-        this.collisionSY = [];
-        this.collisionEX = [];
-        this.collisionEY = [];
-    }
-
-    loadCollisionFile(collisionCSV) {
-        print("collision filename = " + collisionCSV );
-
-        this.collisionTable = loadTable(collisionCSV, 'csv', 'header');
-    }
-
-    // load the image (super), load the arrays from the collision table
-    load() {
-        super.load();
-
-       // print( this.collisionTable.getRowCount() );
-
-        for( let i = 0; i < this.collisionTable.getRowCount(); i++ ) {
-            this.collisionSX[i] = this.collisionTable.getString(i, 'sx');
-            this.collisionSY[i] = this.collisionTable.getString(i, 'sy');
-            this.collisionEX[i] = this.collisionTable.getString(i, 'ex');
-            this.collisionEY[i] = this.collisionTable.getString(i, 'ey');
-        }
+    // output to DebugScreen or console window, if we have no debug object
+    output(s) {
+        print(s);
     }
 }
+
+
 
 

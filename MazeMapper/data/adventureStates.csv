@@ -1,5 +1,5 @@
 StateName,ClassName,PNGFilename,CollisionFilename
 Atari,PNGRoom,assets/atariMaze.png,
-Corn,MazeRoom,assets/cornMaze.png,assets/cornMaze_cl.csv
+Corn,PNGRoom,assets/cornMaze.png,assets/cornMaze_cl.csv
 Rock,PNGRoom,assets/rockMaze.png,
 Scribble,PNGRoom,assets/scribbleMaze.png,
