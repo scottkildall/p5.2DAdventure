@@ -41,10 +41,10 @@ const kDrawYInstructions = 100;
 const kDrawXInstructions = 20;
 
 // collision rects
-var collisionSX = [];
-var collisionSY = [];
-var collisionEX = [];
-var collisionEY = [];
+var collisionX = [];
+var collisionY = [];
+var collisionWidth = [];
+var collisionHeight = [];
 
 var startMouseX;
 var startMouseY;
@@ -237,40 +237,66 @@ function drawInstructions() {
 function drawCollisionRects() {
 
   //go thru collisionRects array and draw each
-  for( let i = 0; i < collisionSX.length; i++ ) {
-    rectMode(CORNERS);
+  for( let i = 0; i < collisionX.length; i++ ) {
+    rectMode(CORNER);
     noFill();
     stroke("#FFFFFF");
     strokeWeight(1);
-    rect(collisionSX[i], collisionSY[i], collisionEX[i], collisionEY[i]);
+    rect(collisionX[i], collisionY[i], collisionWidth[i], collisionHeight[i]);
   }
 }
 
-function addCollisionRect(sx, sy, ex, ey) {
-  nextOffset = collisionSX.length;
 
-  collisionSX[nextOffset] = sx;
-  collisionSY[nextOffset] = sy;
-  collisionEX[nextOffset] = ex;
-  collisionEY[nextOffset] = ey;
-   
+// need to account for x1 < x2 or x2 > x1, same for y1 and y2
+function addCollisionRect(x1, y1, x2, y2) {
+  nextOffset = collisionX.length;
+
+  let x,y,w,h;
+  if( x1 <= x2 ) {
+    x = x1;
+    w = x2 - x1;
+  } 
+  else {
+    x = x2;
+    w = x1 - x2;
+  }
+
+  if( y1 <= y2 ) {
+    y = y1;
+    h = y2 - y1;
+  } 
+  else {
+    y = y2;
+    h = y1 - y2;
+  }
+
+  // now, we are saving by x,y and w,h
+  collisionX[nextOffset] = x;
+  collisionY[nextOffset] = y;
+  print(collisionX);
+  print(collisionWidth);
+  print(collisionHeight);
+  print(w);
+
+  collisionWidth[nextOffset] = w;
+  collisionHeight[nextOffset] = h;
 }
 
 // forces a save into downloads directory
 function saveCollisionRects() {
   table = new p5.Table();
 
-  table.addColumn('sx');
-  table.addColumn('sy');
-  table.addColumn('ex');
-  table.addColumn('ey');
+  table.addColumn('X');
+  table.addColumn('Y');
+  table.addColumn('Width');
+  table.addColumn('Height');
 
-  for( let i = 0; i < collisionSX.length; i++ ) {
+  for( let i = 0; i < collisionX.length; i++ ) {
     let newRow = table.addRow();
-    newRow.setNum('sx', collisionSX[i]);
-    newRow.setNum('sy', collisionSY[i]);
-    newRow.setNum('ex', collisionEX[i]);
-    newRow.setNum('ey', collisionEY[i]);
+    newRow.setNum('X', collisionX[i]);
+    newRow.setNum('Y', collisionY[i]);
+    newRow.setNum('Width', collisionWidth[i]);
+    newRow.setNum('Height', collisionHeight[i]);
   }
   
   // converts .png or any file to .csv
@@ -287,21 +313,20 @@ function updateStateNum(newStateNum) {
   clearCollisionRects();
 
   roomObj = adventureManager.states[adventureManager.getCurrentStateNum()];
-  collisionSX = roomObj.collisionSX;
-  collisionSY = roomObj.collisionSY;
-  collisionEX = roomObj.collisionEX;
-  collisionEY = roomObj.collisionEY;
+  collisionX = roomObj.collisionX;
+  collisionY = roomObj.collisionY;
+  collisionWidth = roomObj.collisionWidth;
+  collisionHeight = roomObj.collisionHeight;
 
-
-  print("collisionSX = " + collisionSX);
+  print("collisionX = " + collisionX);
 }
 
 // makes null arrays of the 4 points
 function clearCollisionRects() {
-  collisionSX = [];
-  collisionSY = [];
-  collisionEX = [];
-  collisionEY = [];
+  collisionX = [];
+  collisionX = [];
+  collisionWidth = [];
+  collisionHeight = [];
 }
 
 function moveSprite() {

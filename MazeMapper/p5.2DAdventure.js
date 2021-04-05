@@ -368,10 +368,11 @@ class PNGRoom {
 
         // collision stuff
         this.collisionTable = null;
-        this.collisionSX = [];
-        this.collisionSY = [];
-        this.collisionEX = [];
-        this.collisionEY = [];
+        this.collisionX = [];
+        this.collisionY = [];
+        this.collisionWidth = [];
+        this.collisionHeight = [];
+        this.collisionSprites = [];
 
         // flag for first-time load for collision table proper loading
         this.loaded = false;
@@ -399,17 +400,18 @@ class PNGRoom {
         // this loads the collision table, we use the flag b/c loadTable needs
         // time to load the data and won't work properly for a few cycles
         if( this.loaded === false ) {
-
-
+            // load the collisions
             if( this.collisionTable !== null) { 
                 this.output("collision table row count = " + this.collisionTable.getRowCount());
                 for( let i = 0; i < this.collisionTable.getRowCount(); i++ ) {
-                    this.collisionSX[i] = this.collisionTable.getString(i, 'sx');
-                    this.collisionSY[i] = this.collisionTable.getString(i, 'sy');
-                    this.collisionEX[i] = this.collisionTable.getString(i, 'ex');
-                    this.collisionEY[i] = this.collisionTable.getString(i, 'ey');
+                    this.collisionX[i] = this.collisionTable.getString(i, 'X');
+                    this.collisionY[i] = this.collisionTable.getString(i, 'Y');
+                    this.collisionWidth[i] = this.collisionTable.getString(i, 'Width');
+                    this.collisionHeight[i] = this.collisionTable.getString(i, 'Height');
                 }
             }
+
+            this.createCollisionSprites();
 
             this.loaded = true; 
         }
@@ -434,6 +436,14 @@ class PNGRoom {
     // output to DebugScreen or console window, if we have no debug object
     output(s) {
         print(s);
+    }
+
+    //-- INTERNAL FUNCTIONS --//
+    createCollisionSprites() {
+        for( let i = 0; i < this.collisionX.length; i++ ) {
+            // figure out the (x,y) then the width
+            //collisionSprites[i] = createSprite (  collisionsSX[i], width  height 
+        } 
     }
 }
 
