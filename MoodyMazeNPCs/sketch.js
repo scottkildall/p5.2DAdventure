@@ -173,14 +173,19 @@ clickableButtonOnOutside = function () {
 }
 
 clickableButtonPressed = function() {
-  print(this.id);
   // these clickables are ones that change your state
   // so they route to the adventure manager to do this
-  adventureManager.clickablePressed(this.name); 
+   
+  if( !checkWeirdNPCButtons(this.id) ) {
+    // route to adventure manager unless you are on weird NPC screne
+    adventureManager.clickablePressed(this.name);
+  }
+  
+  // restart game with max lives
+  if( this.name === "Restart" ) {
+    numLives = 5;
+  }
 
-  let weirdButtonPressed = checkWeirdNPCButtons(this.id);
-
-  print(weirdButtonPressed);
   
 }
 
@@ -205,7 +210,6 @@ function checkWeirdNPCButtons(idNum) {
 // OR if you are out of lives, just dead...
 function die() {
   screamSound.play();
-  return;
   numLives--;
   if( numLives > 0 )  {
     adventureManager.changeState("Start");
@@ -220,7 +224,7 @@ function talkToWeirdy() {
     print( "turning them on");
 
     // turn on visibility for buttons
-    for( let i = answer1Index; i < answer6Index; i++ ) {
+    for( let i = answer1Index; i <= answer6Index; i++ ) {
       clickables[i].visible = true;
     }
 
@@ -290,7 +294,7 @@ class DeepThoughtsRoom extends PNGRoom {
     this.NPCgroup = new Group;
 
     // change this number for more or less
-    this.numNPCs = 20;
+    this.numNPCs = 30;
 
     // is an array of sprites, note we keep this array because
     // later I will add movement to all of them
@@ -310,9 +314,6 @@ class DeepThoughtsRoom extends PNGRoom {
 
       // add to the group
       this.NPCgroup.add(this.NPCSprites[i]);
-
-      // track the # of times you died
-      this.numTimesDied = 0;
     }
   }
 
@@ -327,7 +328,7 @@ class DeepThoughtsRoom extends PNGRoom {
 
     // checks for overlap with ANY sprite in the group, if this happens
     // our class's die() function gets called
-    playerSprite.overlap(this.NPCgroup, die());
+    playerSprite.overlap(this.NPCgroup, die);
 
     for( let i = 0; i < this.NPCSprites.length; i++ ) {
       this.NPCSprites[i].velocity.x = random(-1,1);
