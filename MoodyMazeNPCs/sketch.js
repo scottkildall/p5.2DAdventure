@@ -25,10 +25,21 @@ var clickables;           // an array of clickable objects
 // indexes into the clickable array (constants)
 const playGameIndex = 0;
 
+// some globals we use throughout...
+var screamSound = null;
+var numLives = 5;
+var atariFont = null;
+
 // Allocate Adventure Manager with states table and interaction tables
 function preload() {
   clickablesManager = new ClickableManager('data/clickableLayout.csv');
   adventureManager = new AdventureManager('data/adventureStates.csv', 'data/interactionTable.csv', 'data/clickableLayout.csv');
+
+  // keep this sound in memory as it is low RAM usage
+  screamSound = loadSound('sounds/Wilhelm_Scream.wav');
+
+  // font for drawing
+  atariFont = loadFont('fonts/AtariClassic-Chunky.ttf');
 }
 
 // Setup the adventure manager
@@ -58,6 +69,8 @@ function setup() {
   // call OUR function to setup additional information about the p5.clickables
   // that are not in the array 
   setupClickables(); 
+
+  adventureManager.changeState("Aha");
 }
 
 // Adventure manager handles it all!
@@ -74,6 +87,13 @@ function draw() {
       
     // responds to keydowns
     moveSprite();
+
+    // draw number of lives
+    fill(255);
+    textFont(atariFont);
+    textSize(20)
+    textAlign(LEFT);
+    text( "Lives: " + numLives, width-350, 50);
 
     // this is a function of p5.js, not of this sketch
     drawSprite(playerSprite);
@@ -164,7 +184,7 @@ class InstructionsScreen extends PNGRoom {
     this.textBoxHeight = (height/6)*4; 
 
     // hard-coded, but this could be loaded from a file if we wanted to be more elegant
-    this.instructionsText = "You are navigating through the interior space of your moods. There is no goal to this game, but just a chance to explore various things that might be going on in your head. Use the ARROW keys to navigate your avatar around.";
+    this.instructionsText = "Find WEIRDY who has a riddle for you to solve, but first, make it past the CORONAVIRUS room";
   }
 
   // call the PNGRoom superclass's draw function to draw the background image
@@ -189,11 +209,14 @@ class InstructionsScreen extends PNGRoom {
 // In the FeedMeRoom, you have a number of NPCs. We'll eventually make them
 // moving, but for now, they are static. If you run into the NPC, you
 // "die" and get teleported back to Start
-class FeedMeRoom extends PNGRoom {
+class DeepThoughtsRoom extends PNGRoom {
   // preload() gets called once upon startup
   // We load ONE animation and create 20 NPCs
   // 
   preload() {
+    // this will be loaded when we enter the room
+    this.talkBubble = null;
+
      // load the animation just one time
     this.NPCAnimation = loadAnimation('assets/NPCs/coronaMine_01.png', 'assets/NPCs/coronaMine_04.png');
     
@@ -202,7 +225,7 @@ class FeedMeRoom extends PNGRoom {
     this.NPCgroup = new Group;
 
     // change this number for more or less
-    this.numNPCs = 20;
+    this.numNPCs = 30;
 
     // is an array of sprites, note we keep this array because
     // later I will add movement to all of them
@@ -222,9 +245,13 @@ class FeedMeRoom extends PNGRoom {
 
       // add to the group
       this.NPCgroup.add(this.NPCSprites[i]);
+
+      // track the # of times you died
+      this.numTimesDied = 0;
     }
   }
 
+  
   // pass draw function to superclass, then draw sprites, then check for overlap
   draw() {
     // PNG room draw
@@ -236,12 +263,24 @@ class FeedMeRoom extends PNGRoom {
     // checks for overlap with ANY sprite in the group, if this happens
     // our class's die() function gets called
     playerSprite.overlap(this.NPCgroup, this.die);
+
+    for( let i = 0; i < this.NPCSprites.length; i++ ) {
+      this.NPCSprites[i].velocity.x = random(-1,1);
+      this.NPCSprites[i].velocity.y = random(-1,1);
+    }
   }
 
   // gets called when player sprite collides with an NPC
   // teleport back to start
   die() {
-    adventureManager.changeState("Start");
+    screamSound.play();
+    numLives--;
+    if( numLives > 0 )  {
+      adventureManager.changeState("Start");
+    }
+    else {
+      adventureManager.changeState("Dead");
+    }
   }
 }
 
@@ -250,10 +289,36 @@ class AhaRoom extends PNGRoom {
   // We load ONE animation and create 20 NPCs
   // 
   preload() {
+      // this is our image, we will load when we enter the room
+      this.talkBubble = null;
+      this.drawTalkBubble = true;  // only draw when we run into it
+     
+      // once we run into the avatar, we will begin talking to them
+      this.talked = false;
+
+      // NPC position
+      this.drawX = width/4;
+      this.drawY = height/2 + 100;
+
       // load the animation just one time
-      this.weirdNPCSprite = createSprite( width/4, height/2, 100, 100);
+      this.weirdNPCSprite = createSprite( this.drawX, this.drawY, 100, 100);
       this.weirdNPCSprite.addAnimation('regular',  loadAnimation('assets/NPCs/wierdy_01.png', 'assets/NPCs/wierdy_04.png'));
    }
+
+   load() {
+      // pass to superclass
+      super.load();
+
+      this.talkBubble = loadImage('assets/talkBubble.png');
+    }
+
+    // clears up memory
+    unload() {
+      super.unload();
+
+      this.talkBubble = null;
+      this.drawTalkBubble = false;
+    }
 
    // pass draw function to superclass, then draw sprites, then check for overlap
   draw() {
@@ -267,13 +332,18 @@ class AhaRoom extends PNGRoom {
     //drawSprites(this.weirdNPCgroup);//.draw();
 
     // checks for overlap with ANY sprite in the group, if this happens
-    // our class's die() function gets called
+    // our class's talk() function gets called
     playerSprite.overlap(this.weirdNPCSprite, this.talk);
+
+     
+    if( this.talkBubble !== null && this.drawTalkBubble === true  ) {
+      image(this.talkBubble, this.drawX + 60, this.drawY - 350);
+    }
   }
 
   talk() {
     // we will do something else here, change the state, perhaps!
-    adventureManager.changeState("Start");
+    this.drawTalkBubble = true;
   }
 }
 

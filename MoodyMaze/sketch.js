@@ -66,6 +66,8 @@ function setup() {
   // call OUR function to setup additional information about the p5.clickables
   // that are not in the array 
   setupClickables(); 
+
+  fs = fullscreen();
 }
 
 // Adventure manager handles it all!
