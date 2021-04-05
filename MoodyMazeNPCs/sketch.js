@@ -80,7 +80,7 @@ function setup() {
   // that are not in the array 
   setupClickables(); 
 
-  adventureManager.changeState("Aha");
+  //adventureManager.changeState("Aha");
 }
 
 // Adventure manager handles it all!
@@ -173,18 +173,20 @@ clickableButtonOnOutside = function () {
 }
 
 clickableButtonPressed = function() {
+  print(this.id);
   // these clickables are ones that change your state
   // so they route to the adventure manager to do this
-  if( !checkWeirdNPCButtons(this.id)) {
-    adventureManager.clickablePressed(this.name); 
-  }
+  adventureManager.clickablePressed(this.name); 
+
+  let weirdButtonPressed = checkWeirdNPCButtons(this.id);
+
+  print(weirdButtonPressed);
+  
 }
 
 // this goes through and checks to see if we pressed one of the wierd NPC buttons, if so, we
 // see if it is the corrent one or not
 function checkWeirdNPCButtons(idNum) {
-  print( idNum );
-
   if( idNum >= 2 && idNum <= 7 ) {
     if( idNum === 6) {
       adventureManager.changeState("AhaOpened");
@@ -192,13 +194,18 @@ function checkWeirdNPCButtons(idNum) {
     else {
       die();
     }
+
+    return true;
   }
+
+  return false;
 }
 
 // gets called when player dies, screen and teleport back to start
 // OR if you are out of lives, just dead...
 function die() {
   screamSound.play();
+  return;
   numLives--;
   if( numLives > 0 )  {
     adventureManager.changeState("Start");
@@ -218,6 +225,7 @@ function talkToWeirdy() {
     }
 
     talkedToWeirdNPC = true;
+    print("talked to weidy");
   }
 }
   
@@ -236,7 +244,7 @@ class InstructionsScreen extends PNGRoom {
     this.textBoxHeight = (height/6)*4; 
 
     // hard-coded, but this could be loaded from a file if we wanted to be more elegant
-    this.instructionsText = "Find WEIRDY who has a riddle for you to solve, but first, make it past the CORONAVIRUS room";
+    this.instructionsText = "Find WEIRDY who has a logic problem for you to solve, but first, make it past the CORONAVIRUS room";
   }
 
   // call the PNGRoom superclass's draw function to draw the background image
@@ -364,7 +372,8 @@ class AhaRoom extends PNGRoom {
       super.unload();
 
       this.talkBubble = null;
-      this.talkedToNPC = false;   // have to talk back to NPC if you re-enter
+      talkedToWeirdNPC = false;
+      print("unloading AHA room");
     }
 
    // pass draw function to superclass, then draw sprites, then check for overlap
