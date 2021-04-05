@@ -198,6 +198,7 @@ class ClickableManager {
 	getClickableArray() {
 		return this.clickableArray;
 	}
+	
 	// expects as .csv file with the format as outlined in the readme file
 	setup() {
 		// For each row, allocate a clickable object

@@ -292,6 +292,7 @@ class AdventureManager {
         }
     }
 
+
     // logic here is this (1) look at the clickables table to find the state name
     // (2) look for a match in the clickables array, (3) turn visibility on/off accordingly
     // EVERY clickable either has ONE state that corresponds to it or NO states

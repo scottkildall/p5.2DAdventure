@@ -214,8 +214,10 @@ class ClickableManager {
 			// especially check the case
 			this.clickableArray[i].id = parseInt(this.allocatorTable.getString(i, 'ID'));
 			this.clickableArray[i].name = this.allocatorTable.getString(i, 'Name');
-			this.clickableArray[i].x = parseInt(this.allocatorTable.getString(i, 'x'));
-			this.clickableArray[i].y = parseInt(this.allocatorTable.getString(i, 'y'));
+			this.clickableArray[i].x = eval(this.allocatorTable.getString(i, 'x'));
+			this.clickableArray[i].y = eval(this.allocatorTable.getString(i, 'y'));
+			this.clickableArray[i].width = eval(this.allocatorTable.getString(i, 'width'));
+			this.clickableArray[i].height = eval(this.allocatorTable.getString(i, 'height'));
 			this.clickableArray[i].text = this.allocatorTable.getString(i, 'Text')
 		}
 	

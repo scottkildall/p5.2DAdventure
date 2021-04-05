@@ -24,11 +24,17 @@ var clickables;           // an array of clickable objects
 
 // indexes into the clickable array (constants)
 const playGameIndex = 0;
+const restartGameIndex = 1;
+const answer1Index = 2;
+const answer2Index = 3;
+
 
 // some globals we use throughout...
 var screamSound = null;
 var numLives = 5;
 var atariFont = null;
+var talkedToWeirdNPC = false;
+
 
 // Allocate Adventure Manager with states table and interaction tables
 function preload() {
@@ -165,9 +171,38 @@ clickableButtonOnOutside = function () {
 clickableButtonPressed = function() {
   // these clickables are ones that change your state
   // so they route to the adventure manager to do this
-  adventureManager.clickablePressed(this.name); 
+  if( !checkWeirdNPCButtons(this.id)) {
+    adventureManager.clickablePressed(this.name); 
+  }
 }
 
+// this goes through and checks to see if we pressed one of the wierd NPC buttons, if so, we
+// see if it is the corrent one or not
+function checkWeirdNPCButtons(idNum) {
+  print( idNum );
+
+  if( idNum >= 2 && idNum <= 7 ) {
+    if( idNum === 6) {
+      alert("correct")
+    }
+    else {
+      die();
+    }
+  }
+}
+
+// gets called when player sprite collides with an NPC
+// teleport back to start
+function die() {
+  screamSound.play();
+  numLives--;
+  if( numLives > 0 )  {
+    adventureManager.changeState("Start");
+  }
+  else {
+    adventureManager.changeState("Dead");
+  }
+}
 
 
 //-------------- SUBCLASSES / YOUR DRAW CODE CAN GO HERE ---------------//
@@ -262,24 +297,11 @@ class DeepThoughtsRoom extends PNGRoom {
 
     // checks for overlap with ANY sprite in the group, if this happens
     // our class's die() function gets called
-    playerSprite.overlap(this.NPCgroup, this.die);
+    playerSprite.overlap(this.NPCgroup, die());
 
     for( let i = 0; i < this.NPCSprites.length; i++ ) {
       this.NPCSprites[i].velocity.x = random(-1,1);
       this.NPCSprites[i].velocity.y = random(-1,1);
-    }
-  }
-
-  // gets called when player sprite collides with an NPC
-  // teleport back to start
-  die() {
-    screamSound.play();
-    numLives--;
-    if( numLives > 0 )  {
-      adventureManager.changeState("Start");
-    }
-    else {
-      adventureManager.changeState("Dead");
     }
   }
 }
@@ -291,10 +313,8 @@ class AhaRoom extends PNGRoom {
   preload() {
       // this is our image, we will load when we enter the room
       this.talkBubble = null;
-      this.drawTalkBubble = true;  // only draw when we run into it
-     
-      // once we run into the avatar, we will begin talking to them
-      this.talked = false;
+      this.talkedToNPC = false;  // only draw when we run into it
+      talkedToWeirdNPC = false;
 
       // NPC position
       this.drawX = width/4;
@@ -317,7 +337,7 @@ class AhaRoom extends PNGRoom {
       super.unload();
 
       this.talkBubble = null;
-      this.drawTalkBubble = false;
+      this.talkedToNPC = false;   // have to talk back to NPC if you re-enter
     }
 
    // pass draw function to superclass, then draw sprites, then check for overlap
@@ -336,14 +356,14 @@ class AhaRoom extends PNGRoom {
     playerSprite.overlap(this.weirdNPCSprite, this.talk);
 
      
-    if( this.talkBubble !== null && this.drawTalkBubble === true  ) {
+    if( this.talkBubble !== null && talkedToWeirdNPC === true ) {
       image(this.talkBubble, this.drawX + 60, this.drawY - 350);
     }
   }
 
+
   talk() {
-    // we will do something else here, change the state, perhaps!
-    this.drawTalkBubble = true;
+    talkedToWeirdNPC = true;
   }
 }
 
