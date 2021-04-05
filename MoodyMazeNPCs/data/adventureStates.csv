@@ -9,4 +9,4 @@ ID,StateName,ClassName,PNGFilename,CollisionFilename
 7,Mad,PNGRoom,assets/Mad.png,
 8,Calm,PNGRoom,assets/Calm.png,
 9,DeepThoughts,PNGRoom,assets/DeepThoughts.png,
-10,Aha,PNGRoom,Assets/Aha.png,
+10,Aha,AhaRoom,Assets/Aha.png,

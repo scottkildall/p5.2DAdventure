@@ -49,23 +49,10 @@ class AdventureManager {
             // All classes (for now) have a PNGFilename, could add a blank room
             this.states[validStateCount].setup( this.statesTable.getString(i, 'PNGFilename'),
                                                 this.statesTable.getString(i, 'CollisionFilename'));
-            // check to see if className is MazeRoom, and we add collision file, if so
-            if( className === "MazeRoom") {
-                print("loading maze room");
-                this.states[validStateCount].loadCollisionFile(this.statesTable.getString(i, 'CollisionFilename'));
-            }
+           
             this.states[validStateCount].preload();
 
-/*
-            if( className === "PNGRoom" ) {
-                // load the file from the table
-                this.states[validStateCount].setup(this.statesTable.getString(i, 'PNGFilename'));
-            }
-            else if( className == "MazeRoom" ) {
-                // do setup here
-            }
-*/
-             validStateCount++;
+            validStateCount++;
         }
     
         if( validStateCount > 0 ) {
@@ -106,7 +93,13 @@ class AdventureManager {
             this.checkPlayerSprite();
             background(this.backgroundColor);
             this.states[this.currentState].draw();
+            //this.states[this.currentState].checkForCollision(this.playerSprite, this.collidedWithWall);
         }
+    }
+
+
+    collidedWithWall() {
+        print("collided!");
     }
 
     // move to interation table!
@@ -373,6 +366,7 @@ class PNGRoom {
         this.collisionWidth = [];
         this.collisionHeight = [];
         this.collisionSprites = [];
+        this.collisionGroup = null;
 
         // flag for first-time load for collision table proper loading
         this.loaded = false;
@@ -430,9 +424,37 @@ class PNGRoom {
         push();
         imageMode(CENTER);
         image(this.image,width/2,height/2);
+
+        //imageMode(CORNER);
+        fill(255,0,0);
+        for( let i = 0; i < this.collisionSprites.length; i++ ) {
+           drawSprite(this.collisionSprites[i]);
+           //rect(collisionX[i],collisionY[i],collisionWidth[i],collisionHeight[i]);
+        }
+
         pop();
+
+       // drawSprites();
+       
     }
 
+    // ps = player sprite
+    // callbackFunction = callbackFunction
+    checkForCollision(ps, callbackFunction) {
+        if( ps !== null && this.collisionGroup !== null ) {
+            // for( let i = 0; i < this.collisionSprites.length; i++ ) {
+            //     //drawSprite(this.collisionSprites[i]);
+
+            // }
+            ps.overlap(this.collisionGroup, this.die);
+         // checks for overlap with ANY sprite in the group, if this happens
+        } 
+    }
+
+    die() {
+        print("die");
+    }
+    
     // output to DebugScreen or console window, if we have no debug object
     output(s) {
         print(s);
@@ -440,10 +462,23 @@ class PNGRoom {
 
     //-- INTERNAL FUNCTIONS --//
     createCollisionSprites() {
+        this.collisionGroup = new Group;
+
         for( let i = 0; i < this.collisionX.length; i++ ) {
-            // figure out the (x,y) then the width
-            //collisionSprites[i] = createSprite (  collisionsSX[i], width  height 
-        } 
+           print( "row: " + i)
+            print(" [x] " + this.collisionX[i] );
+             print(" [y] " + this.collisionY[i] );
+             print(" [width] " + this.collisionWidth[i] );
+            print(" [height] " + this.collisionHeight[i] );
+            
+            this.collisionSprites[i] = createSprite( this.collisionX[i], this.collisionY[i], this.collisionWidth[i], this.collisionHeight[i] ); 
+              //this.collisionSprites[i].addAnimation('regular', loadAnimation('assets/avatars/bubbly0001.png', 'assets/avatars/bubbly0004.png') );
+
+              print( this.collisionSprites[i]);
+            // add to the group
+            this.collisionGroup.add(this.collisionSprites[i]);
+        }
+
     }
 }
 

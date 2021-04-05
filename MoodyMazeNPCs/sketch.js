@@ -195,7 +195,7 @@ class FeedMeRoom extends PNGRoom {
   // 
   preload() {
      // load the animation just one time
-    this.NPCAnimation = loadAnimation('assets/NPCs/bubbly0001.png', 'assets/NPCs/bubbly0004.png');
+    this.NPCAnimation = loadAnimation('assets/NPCs/coronaMine_01.png', 'assets/NPCs/coronaMine_04.png');
     
     // this is a type from p5play, so we can do operations on all sprites
     // at once
@@ -215,7 +215,7 @@ class FeedMeRoom extends PNGRoom {
       let randY = random(100, height-100);
 
       // create the sprite
-      this.NPCSprites[i] = createSprite( randX, randY, 80, 80);
+      this.NPCSprites[i] = createSprite( randX, randY, 40, 40);
     
       // add the animation to it (important to load the animation just one time)
       this.NPCSprites[i].addAnimation('regular', this.NPCAnimation );
@@ -244,3 +244,36 @@ class FeedMeRoom extends PNGRoom {
     adventureManager.changeState("Start");
   }
 }
+
+class AhaRoom extends PNGRoom {
+  // preload() gets called once upon startup
+  // We load ONE animation and create 20 NPCs
+  // 
+  preload() {
+      // load the animation just one time
+      this.weirdNPCSprite = createSprite( width/4, height/2, 100, 100);
+      this.weirdNPCSprite.addAnimation('regular',  loadAnimation('assets/NPCs/wierdy_01.png', 'assets/NPCs/wierdy_04.png'));
+   }
+
+   // pass draw function to superclass, then draw sprites, then check for overlap
+  draw() {
+    // PNG room draw
+    super.draw();
+
+    // draws all the sprites in the group
+    //this.weirdNPCSprite.draw();
+    drawSprite(this.weirdNPCSprite)
+    // draws all the sprites in the group - 
+    //drawSprites(this.weirdNPCgroup);//.draw();
+
+    // checks for overlap with ANY sprite in the group, if this happens
+    // our class's die() function gets called
+    playerSprite.overlap(this.weirdNPCSprite, this.talk);
+  }
+
+  talk() {
+    // we will do something else here, change the state, perhaps!
+    adventureManager.changeState("Start");
+  }
+}
+
