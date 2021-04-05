@@ -27,6 +27,10 @@ const playGameIndex = 0;
 const restartGameIndex = 1;
 const answer1Index = 2;
 const answer2Index = 3;
+const answer3Index = 4;
+const answer4Index = 5;
+const answer5Index = 6;
+const answer6Index = 7;
 
 
 // some globals we use throughout...
@@ -183,7 +187,7 @@ function checkWeirdNPCButtons(idNum) {
 
   if( idNum >= 2 && idNum <= 7 ) {
     if( idNum === 6) {
-      alert("correct")
+      adventureManager.changeState("AhaOpened");
     }
     else {
       die();
@@ -191,8 +195,8 @@ function checkWeirdNPCButtons(idNum) {
   }
 }
 
-// gets called when player sprite collides with an NPC
-// teleport back to start
+// gets called when player dies, screen and teleport back to start
+// OR if you are out of lives, just dead...
 function die() {
   screamSound.play();
   numLives--;
@@ -204,6 +208,19 @@ function die() {
   }
 }
 
+function talkToWeirdy() {
+  if( talkedToWeirdNPC === false ) {
+    print( "turning them on");
+
+    // turn on visibility for buttons
+    for( let i = answer1Index; i < answer6Index; i++ ) {
+      clickables[i].visible = true;
+    }
+
+    talkedToWeirdNPC = true;
+  }
+}
+  
 
 //-------------- SUBCLASSES / YOUR DRAW CODE CAN GO HERE ---------------//
 
@@ -249,6 +266,11 @@ class DeepThoughtsRoom extends PNGRoom {
   // We load ONE animation and create 20 NPCs
   // 
   preload() {
+    // turn off buttons
+    for( let i = answer1Index; i <= answer6Index; i++ ) {
+     clickables[i].visible = false;
+    }
+
     // this will be loaded when we enter the room
     this.talkBubble = null;
 
@@ -260,7 +282,7 @@ class DeepThoughtsRoom extends PNGRoom {
     this.NPCgroup = new Group;
 
     // change this number for more or less
-    this.numNPCs = 30;
+    this.numNPCs = 20;
 
     // is an array of sprites, note we keep this array because
     // later I will add movement to all of them
@@ -330,6 +352,11 @@ class AhaRoom extends PNGRoom {
       super.load();
 
       this.talkBubble = loadImage('assets/talkBubble.png');
+      
+      // turn off buttons
+      for( let i = answer1Index; i <= answer6Index; i++ ) {
+       clickables[i].visible = false;
+      }
     }
 
     // clears up memory
@@ -352,18 +379,13 @@ class AhaRoom extends PNGRoom {
     //drawSprites(this.weirdNPCgroup);//.draw();
 
     // checks for overlap with ANY sprite in the group, if this happens
-    // our class's talk() function gets called
-    playerSprite.overlap(this.weirdNPCSprite, this.talk);
+    // talk() function gets called
+    playerSprite.overlap(this.weirdNPCSprite, talkToWeirdy );
 
      
     if( this.talkBubble !== null && talkedToWeirdNPC === true ) {
       image(this.talkBubble, this.drawX + 60, this.drawY - 350);
     }
-  }
-
-
-  talk() {
-    talkedToWeirdNPC = true;
   }
 }
 

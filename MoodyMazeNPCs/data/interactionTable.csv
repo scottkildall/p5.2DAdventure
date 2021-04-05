@@ -21,5 +21,6 @@ Calm,,,,,W,DeepThoughts
 DeepThoughts,,,,,E,Calm
 DeepThoughts,,,,,W,Aha
 Aha,,,,,E,DeepThoughts
-Aha,,,,,W,Sleepy
+AhaOpened,,,,,W,Victory
+Victory,,,,,E,AhaOpened
 Dead,,,,Restart,,Instructions
