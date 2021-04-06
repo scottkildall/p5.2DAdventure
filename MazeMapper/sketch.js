@@ -328,6 +328,36 @@ function addCollisionRect(x1, y1, x2, y2) {
     return;
   }
 
+  // order it so that SX < EX and SY < EY
+  let temp;
+  if( x1 > x2 ) {
+    temp = x1;
+    x1 = x2;
+    x2 = temp;
+  }
+
+  if( y1 > y1 ) {
+    temp = y1;
+    y1 = y2;
+    y2 = temp;
+  }
+
+
+  // expand to edges of screen
+  let pixelAllowance = 20;
+  if( x1 < pixelAllowance ) {
+    x1 = 0;
+  }
+  if( x2 > width-pixelAllowance ) {
+    x2 = width;
+  }
+  if( y1 < pixelAllowance ) {
+    y1 = 0;
+  }
+  if( y2 > height-pixelAllowance ) {
+    y2 = height;
+  }
+
   // add to the array
   nextOffset = collisionSX.length;
 
@@ -336,20 +366,6 @@ function addCollisionRect(x1, y1, x2, y2) {
   collisionSY[nextOffset] = y1;
   collisionEX[nextOffset] = x2;
   collisionEY[nextOffset] = y2;
-
-  // order it so that SX < EX and SY < EY
-  let temp;
-  if( collisionSX[nextOffset] > collisionEX[nextOffset] ) {
-    temp = collisionSX[nextOffset];
-    collisionSX[nextOffset] = collisionEX[nextOffset];
-    collisionEX[nextOffset] = temp;
-  }
-
-  if( collisionSY[nextOffset] > collisionEY[nextOffset] ) {
-    temp = collisionSY[nextOffset];
-    collisionSY[nextOffset] = collisionEY[nextOffset];
-    collisionEY[nextOffset] = temp;
-  }
 }
 
 // forces a save into downloads directory
