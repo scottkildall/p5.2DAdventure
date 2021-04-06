@@ -121,14 +121,12 @@ function draw() {
 
   push();
 
-  // imageMode(CENTER);
   
   rectMode(CORNER);
   
 
-  //noTint();
+  // draws the rect that we currently making
   if( gState === kStateFirstMouse ) {
-    //tint(240);
     noFill();
     stroke("#FFFFFF");
     strokeWeight(1);
@@ -273,14 +271,12 @@ function drawInstructions() {
   }
 
   text( "SPACE to toggle instructions", kDrawXInstructions, kDrawYInstructions);
-  text( "Current file = " + pngFilename + "  |  ClassName = " + className, kDrawXInstructions, kDrawYInstructions+kTextLineHeight);
+  text( "Current file = " + pngFilename + "  |  ClassName = " + className, kDrawXInstructions, kDrawYInstructions+kTextLineHeight*1);
   text( "[n] for next room | [p] for previous room", kDrawXInstructions, kDrawYInstructions+kTextLineHeight*2);
-  
-  text( "Type [i] to invert background", kDrawXInstructions, kDrawYInstructions+kTextLineHeight*3);
-  text( "Type [,] or [.] to select rect", kDrawXInstructions, kDrawYInstructions+kTextLineHeight*4);
-  text( "Type [x] to delete rect", kDrawXInstructions, kDrawYInstructions+kTextLineHeight*5);
-  text( "Type [s] to save collision rects", kDrawXInstructions, kDrawYInstructions+kTextLineHeight*6);
-  text( "Type [a] to draw player sprite", kDrawXInstructions, kDrawYInstructions+kTextLineHeight*7);
+  text( "Type [,] or [.] to select rect", kDrawXInstructions, kDrawYInstructions+kTextLineHeight*3);
+  text( "Type [x] to delete rect", kDrawXInstructions, kDrawYInstructions+kTextLineHeight*4);
+  text( "Type [s] to save collision rects", kDrawXInstructions, kDrawYInstructions+kTextLineHeight*5);
+  text( "Type [a] to draw player sprite", kDrawXInstructions, kDrawYInstructions+kTextLineHeight*6);
  }
 
 function drawCollisionRects() {
@@ -296,8 +292,9 @@ function drawCollisionRects() {
 }
 
 function drawRectNumber(rectIndex) {
-  let midX = collisionSX[rectIndex] + (collisionEX[rectIndex]-collisionSX[rectIndex])/2;
-  let midY = collisionSY[rectIndex] + (collisionEY[rectIndex]-collisionSY[rectIndex])/2;
+  // ugh, Javascript type things
+  var midX = parseInt(collisionSX[rectIndex]) + parseInt((collisionEX[rectIndex]-collisionSX[rectIndex])/2);
+  var midY = parseInt(collisionSY[rectIndex]) + parseInt((collisionEY[rectIndex]-collisionSY[rectIndex])/2);
 
   push();
   rectMode(CENTER);
