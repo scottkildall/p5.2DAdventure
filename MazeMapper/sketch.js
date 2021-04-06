@@ -59,6 +59,9 @@ var className;
 var showPlayerSprite = false;
 var playerSprite = null;
 
+// start with invalid
+var selectedRectIndex = -1; 
+
 function preload(){
   clickablesManager = new ClickableManager('data/clickableLayout.csv');
   adventureManager = new AdventureManager('data/adventureStates.csv', 'data/interactionTable.csv', 'data/clickableLayout.csv');
@@ -153,8 +156,14 @@ function draw() {
 
 
 function keyPressed() {
+  // toggle instructions
   if( key === ' ') {
       gDrawInstructions = !gDrawInstructions;
+  }
+
+  // escape will stop drawing a rect
+  if( keyCode === ESCAPE &&  gState === kStateFirstMouse ) {
+    gState = kStateWait;
   }
 
   // Next key, check for overflow
@@ -184,9 +193,50 @@ function keyPressed() {
     saveCollisionRects();
   }
 
+  else if( key === 'x') {
+    deleteSelectedRect();
+  }
+
   // saves to your folder
   else if( key === 'a' ) {
     showPlayerSprite = !showPlayerSprite;
+  }
+
+// go forward one index, check for overflow
+  if( key === '.' ) {
+    // don't change anything if we have no length
+    if( collisionSX.length === 0 ) {
+      return;
+    }
+
+    // make zero if invalid
+    if( selectedRectIndex === -1 || selectedRectIndex >= collisionSX.length ) {
+      selectedRectIndex = 0;
+    }
+    else {
+      selectedRectIndex++;
+      if( selectedRectIndex >= collisionSX.length ) {
+        selectedRectIndex = 0;
+      }
+    }
+  }
+
+// go back one index, check for overflow
+  if( key === ',' ) {
+    if( collisionSX.length === 0 ) {
+      return;
+    }
+
+    // make zero if invalid
+    if( selectedRectIndex === -1 || selectedRectIndex >= collisionSX.length ) {
+      selectedRectIndex = 0;
+    }
+    else {
+      selectedRectIndex--;
+      if( selectedRectIndex < 0 ) {
+        selectedRectIndex = collisionSX.length - 1;
+      }
+    }
   }
 }
 
@@ -210,6 +260,7 @@ function mouseReleased() {
   }
 }
 
+
 function drawInstructions() {
   textSize(kTextLineHeight);
   textAlign(LEFT);
@@ -226,7 +277,7 @@ function drawInstructions() {
   text( "[n] for next room | [p] for previous room", kDrawXInstructions, kDrawYInstructions+kTextLineHeight*2);
   
   text( "Type [i] to invert background", kDrawXInstructions, kDrawYInstructions+kTextLineHeight*3);
-  text( "Left/Right arrows to select rect", kDrawXInstructions, kDrawYInstructions+kTextLineHeight*4);
+  text( "Type [,] or [.] to select rect", kDrawXInstructions, kDrawYInstructions+kTextLineHeight*4);
   text( "Type [x] to delete rect", kDrawXInstructions, kDrawYInstructions+kTextLineHeight*5);
   text( "Type [s] to save collision rects", kDrawXInstructions, kDrawYInstructions+kTextLineHeight*6);
   text( "Type [a] to draw player sprite", kDrawXInstructions, kDrawYInstructions+kTextLineHeight*7);
@@ -240,9 +291,38 @@ function drawCollisionRects() {
     stroke("#FFFFFF");
     strokeWeight(1);
     rect(collisionSX[i], collisionSY[i], collisionEX[i], collisionEY[i]);
+    drawRectNumber(i);
   }
 }
 
+function drawRectNumber(rectIndex) {
+  let midX = collisionSX[rectIndex] + (collisionEX[rectIndex]-collisionSX[rectIndex])/2;
+  let midY = collisionSY[rectIndex] + (collisionEY[rectIndex]-collisionSY[rectIndex])/2;
+
+  push();
+  rectMode(CENTER);
+  fill(64);
+
+  if( rectIndex === selectedRectIndex ) {
+    fill(240,120,0);
+  }
+
+  noStroke();
+  rect(midX, midY, 20, 20);
+  
+  // no draw selected if invalid
+  fill(255);
+  
+  
+
+  textAlign(CENTER);
+  textSize(12);
+  text(rectIndex,midX,midY+3);
+
+  // rect(width/2,height/2, 12, 12);
+  pop();
+
+}
 
 // need to account for x1 < x2 or x2 > x1, same for y1 and y2
 function addCollisionRect(x1, y1, x2, y2) {
@@ -297,6 +377,22 @@ function saveCollisionRects() {
   let csvFilename = pngFilename.substr(0, pos < 0 ? pngFilename.length : pos) + "_cl" + ".csv";
 
   saveTable(table, csvFilename);
+}
+
+function deleteSelectedRect() {
+  if( selectedRectIndex === -1 || selectedRectIndex >= collisionSX.length ) {
+    return;
+  }
+
+  collisionSX.splice(selectedRectIndex,1);
+  collisionEX.splice(selectedRectIndex,1);
+  collisionSY.splice(selectedRectIndex,1);
+  collisionEY.splice(selectedRectIndex,1);
+
+  // if length is zero, this will become -1, which is what we want
+  if(  selectedRectIndex >= collisionSX.length ) {
+    selectedRectIndex = collisionSX.length-1;
+  }
 }
 
 function updateStateNum(newStateNum) {
