@@ -41,10 +41,10 @@ const kDrawYInstructions = 100;
 const kDrawXInstructions = 20;
 
 // collision rects
-var collisionX = [];
-var collisionY = [];
-var collisionWidth = [];
-var collisionHeight = [];
+var collisionSX = [];
+var collisionSY = [];
+var collisionEX = [];
+var collisionEY = [];
 
 var startMouseX;
 var startMouseY;
@@ -221,7 +221,6 @@ function drawInstructions() {
     fill(0);
   }
 
-
   text( "SPACE to toggle instructions", kDrawXInstructions, kDrawYInstructions);
   text( "Current file = " + pngFilename + "  |  ClassName = " + className, kDrawXInstructions, kDrawYInstructions+kTextLineHeight);
   text( "[n] for next room | [p] for previous room", kDrawXInstructions, kDrawYInstructions+kTextLineHeight*2);
@@ -234,68 +233,63 @@ function drawInstructions() {
  }
 
 function drawCollisionRects() {
-
   //go thru collisionRects array and draw each
-  for( let i = 0; i < collisionX.length; i++ ) {
-    rectMode(CORNER);
+  for( let i = 0; i < collisionSX.length; i++ ) {
+    rectMode(CORNERS);
     noFill();
     stroke("#FFFFFF");
     strokeWeight(1);
-    rect(collisionX[i], collisionY[i], collisionWidth[i], collisionHeight[i]);
+    rect(collisionSX[i], collisionSY[i], collisionEX[i], collisionEY[i]);
   }
 }
 
 
 // need to account for x1 < x2 or x2 > x1, same for y1 and y2
 function addCollisionRect(x1, y1, x2, y2) {
-  nextOffset = collisionX.length;
-
-  let x,y,w,h;
-  if( x1 <= x2 ) {
-    x = x1;
-    w = x2 - x1;
-  } 
-  else {
-    x = x2;
-    w = x1 - x2;
+  if( x1 === x2 || y1 === y2 ) {
+    print("bad collision rect");
+    return;
   }
 
-  if( y1 <= y2 ) {
-    y = y1;
-    h = y2 - y1;
-  } 
-  else {
-    y = y2;
-    h = y1 - y2;
-  }
+  // add to the array
+  nextOffset = collisionSX.length;
 
   // now, we are saving by x,y and w,h
-  collisionX[nextOffset] = x;
-  collisionY[nextOffset] = y;
-  print(collisionX);
-  print(collisionWidth);
-  print(collisionHeight);
-  print(w);
+  collisionSX[nextOffset] = x1;
+  collisionSY[nextOffset] = y1;
+  collisionEX[nextOffset] = x2;
+  collisionEY[nextOffset] = y2;
 
-  collisionWidth[nextOffset] = w;
-  collisionHeight[nextOffset] = h;
+  // order it so that SX < EX and SY < EY
+  let temp;
+  if( collisionSX[nextOffset] > collisionEX[nextOffset] ) {
+    temp = collisionSX[nextOffset];
+    collisionSX[nextOffset] = collisionEX[nextOffset];
+    collisionEX[nextOffset] = temp;
+  }
+
+  if( collisionSY[nextOffset] > collisionEY[nextOffset] ) {
+    temp = collisionSY[nextOffset];
+    collisionSY[nextOffset] = collisionEY[nextOffset];
+    collisionEY[nextOffset] = temp;
+  }
 }
 
 // forces a save into downloads directory
 function saveCollisionRects() {
   table = new p5.Table();
 
-  table.addColumn('X');
-  table.addColumn('Y');
-  table.addColumn('Width');
-  table.addColumn('Height');
+  table.addColumn('sx');
+  table.addColumn('sy');
+  table.addColumn('ex');
+  table.addColumn('ey');
 
-  for( let i = 0; i < collisionX.length; i++ ) {
+  for( let i = 0; i < collisionSX.length; i++ ) {
     let newRow = table.addRow();
-    newRow.setNum('X', collisionX[i]);
-    newRow.setNum('Y', collisionY[i]);
-    newRow.setNum('Width', collisionWidth[i]);
-    newRow.setNum('Height', collisionHeight[i]);
+    newRow.setNum('sx', collisionSX[i]);
+    newRow.setNum('sy', collisionSY[i]);
+    newRow.setNum('ex', collisionEX[i]);
+    newRow.setNum('ey', collisionEY[i]);
   }
   
   // converts .png or any file to .csv
@@ -312,20 +306,18 @@ function updateStateNum(newStateNum) {
   clearCollisionRects();
 
   roomObj = adventureManager.states[adventureManager.getCurrentStateNum()];
-  collisionX = roomObj.collisionX;
-  collisionY = roomObj.collisionY;
-  collisionWidth = roomObj.collisionWidth;
-  collisionHeight = roomObj.collisionHeight;
-
-  print("collisionX = " + collisionX);
+  collisionSX = roomObj.collisionSX;
+  collisionSY = roomObj.collisionSY;
+  collisionEX = roomObj.collisionEX;
+  collisionEY = roomObj.collisionEY;
 }
 
 // makes null arrays of the 4 points
 function clearCollisionRects() {
-  collisionX = [];
-  collisionX = [];
-  collisionWidth = [];
-  collisionHeight = [];
+  collisionSX = [];
+  collisionSY = [];
+  collisionEX = [];
+  collisionEX = [];
 }
 
 function moveSprite() {
