@@ -18,7 +18,8 @@ class AdventureManager {
         this.states = [];
         this.statesTable = loadTable(statesFilename, 'csv', 'header');
         this.interactionTable = loadTable(interactionFilename, 'csv', 'header');
-        
+        this.savedPlayerSpritePosition = createVector(width/2, height/2);
+
         if( clickableLayoutFilename === null ) {
             this.clickableTable = null;
         }
@@ -91,15 +92,24 @@ class AdventureManager {
         }
         else {
             this.checkPlayerSprite();
+
+            // this will reset the player position, if we go outside of a collision rect
+            if( this.states[this.currentState].checkForCollision(this.playerSprite) === true ) {
+                // set to last good position
+                this.playerSprite.position.x = this.savedPlayerSpritePosition.x;
+                this.playerSprite.position.y = this.savedPlayerSpritePosition.y;
+            }
+            else {
+                // save the last poisition for checkCollision in the future
+                this.savedPlayerSpritePosition.x = this.playerSprite.position.x;
+                this.savedPlayerSpritePosition.y = this.playerSprite.position.y;
+            }
+
             background(this.backgroundColor);
             this.states[this.currentState].draw();
-            //this.states[this.currentState].checkForCollision(this.playerSprite, this.collidedWithWall);
+            
+
         }
-    }
-
-
-    collidedWithWall() {
-        print("collided!");
     }
 
     // move to interation table!
@@ -361,13 +371,11 @@ class PNGRoom {
 
         // collision stuff
         this.collisionTable = null;
-        this.collisionX = [];
-        this.collisionY = [];
-        this.collisionWidth = [];
-        this.collisionHeight = [];
-        this.collisionSprites = [];
-        this.collisionGroup = null;
-
+        this.collisionSX = [];
+        this.collisionSY = [];
+        this.collisionEX = [];
+        this.collisionEY = [];
+    
         // flag for first-time load for collision table proper loading
         this.loaded = false;
     }
@@ -398,15 +406,12 @@ class PNGRoom {
             if( this.collisionTable !== null) { 
                 this.output("collision table row count = " + this.collisionTable.getRowCount());
                 for( let i = 0; i < this.collisionTable.getRowCount(); i++ ) {
-                    this.collisionX[i] = this.collisionTable.getString(i, 'X');
-                    this.collisionY[i] = this.collisionTable.getString(i, 'Y');
-                    this.collisionWidth[i] = this.collisionTable.getString(i, 'Width');
-                    this.collisionHeight[i] = this.collisionTable.getString(i, 'Height');
+                    this.collisionSX[i] = this.collisionTable.getString(i, 'sx');
+                    this.collisionSY[i] = this.collisionTable.getString(i, 'sy');
+                    this.collisionEX[i] = this.collisionTable.getString(i, 'ex');
+                    this.collisionEY[i] = this.collisionTable.getString(i, 'ey');
                 }
             }
-
-            this.createCollisionSprites();
-
             this.loaded = true; 
         }
     }
@@ -426,59 +431,32 @@ class PNGRoom {
         image(this.image,width/2,height/2);
 
         //imageMode(CORNER);
-        fill(255,0,0);
-        for( let i = 0; i < this.collisionSprites.length; i++ ) {
-           drawSprite(this.collisionSprites[i]);
-           //rect(collisionX[i],collisionY[i],collisionWidth[i],collisionHeight[i]);
+        //fill(255,0,0);
+        // draw rects to see...
+
+        pop(); 
+    }
+
+    // Go through our array and ook to see if we are in bounds anywhere
+    checkForCollision(ps) {
+        if( ps !== null ) {  
+            for(let i = 0; i < this.collisionSX.length; i++ ) {
+                if( ps.position.x >= this.collisionSX[i] &&  ps.position.x <= this.collisionEX[i] ) {
+                    if( ps.position.y >= this.collisionSY[i] &&  ps.position.y <= this.collisionEY[i] ) {
+                        //print("collsion at shape " + i);
+                        return true;
+                    }
+                }
+            }
         }
 
-        pop();
-
-       // drawSprites();
-       
+        return false; 
     }
 
-    // ps = player sprite
-    // callbackFunction = callbackFunction
-    checkForCollision(ps, callbackFunction) {
-        if( ps !== null && this.collisionGroup !== null ) {
-            // for( let i = 0; i < this.collisionSprites.length; i++ ) {
-            //     //drawSprite(this.collisionSprites[i]);
-
-            // }
-            ps.overlap(this.collisionGroup, this.die);
-         // checks for overlap with ANY sprite in the group, if this happens
-        } 
-    }
-
-    die() {
-        print("die");
-    }
     
     // output to DebugScreen or console window, if we have no debug object
     output(s) {
         print(s);
-    }
-
-    //-- INTERNAL FUNCTIONS --//
-    createCollisionSprites() {
-        this.collisionGroup = new Group;
-
-        for( let i = 0; i < this.collisionX.length; i++ ) {
-           print( "row: " + i)
-            print(" [x] " + this.collisionX[i] );
-             print(" [y] " + this.collisionY[i] );
-             print(" [width] " + this.collisionWidth[i] );
-            print(" [height] " + this.collisionHeight[i] );
-            
-            this.collisionSprites[i] = createSprite( this.collisionX[i], this.collisionY[i], this.collisionWidth[i], this.collisionHeight[i] ); 
-              //this.collisionSprites[i].addAnimation('regular', loadAnimation('assets/avatars/bubbly0001.png', 'assets/avatars/bubbly0004.png') );
-
-              print( this.collisionSprites[i]);
-            // add to the group
-            this.collisionGroup.add(this.collisionSprites[i]);
-        }
-
     }
 }
 

@@ -311,14 +311,12 @@ class AdventureManager {
         }
         else if(this.playerSprite.position.x > width+1 ) {
             this.playerSprite.position.x = width;
-            //this.changeState("Maze_NE");
         }
         else if(this.playerSprite.position.y < -1 ) {
             this.playerSprite.position.y = 0;
         }
         else if(this.playerSprite.position.y > height ) {
             this.playerSprite.position.y = height;
-            //this.changeState("Maze_NE");
         }
     }
 
@@ -352,11 +350,11 @@ class AdventureManager {
             // Otherwise, we are binding, so turn button on/off accordingly
             if( clickableStateArray[i] === newStateName ) {
                 this.clickableArray[i].visible = true;
-                print("set to visible");
+                //print("set to visible");
             }
             else {
                 this.clickableArray[i].visible = false;   
-                print("set to hide");
+               // print("set to hide");
             }
         }
     }

@@ -7,7 +7,7 @@ ID,StateName,ClassName,PNGFilename,CollisionFilename
 5,HoHum,PNGRoom,assets/HoHum.png,
 6,MyNerves,PNGRoom,assets/MyNerves.png,
 7,Mad,PNGRoom,assets/Mad.png,
-8,Calm,PNGRoom,assets/Calm.png,
+8,Calm,PNGRoom,assets/Calm.png,assets/Calm_cl.csv
 9,DeepThoughts,DeepThoughtsRoom,assets/DeepThoughts.png,
 10,Aha,AhaRoom,assets/Aha.png,
 11,Dead,PNGRoom,assets/Dead.png,
