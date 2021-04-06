@@ -47,20 +47,12 @@ class AdventureManager {
             this.states[validStateCount] = eval("new " + className);
             
             // All classes (for now) have a PNGFilename, could add a blank room
-            this.states[validStateCount].setup(this.statesTable.getString(i, 'PNGFilename'));
+            this.states[validStateCount].setup( this.statesTable.getString(i, 'PNGFilename'),
+                                                this.statesTable.getString(i, 'CollisionFilename'));
+           
+            this.states[validStateCount].preload();
 
-             this.states[validStateCount].preload();
-
-/*
-            if( className === "PNGRoom" ) {
-                // load the file from the table
-                this.states[validStateCount].setup(this.statesTable.getString(i, 'PNGFilename'));
-            }
-            else if( className == "MazeRoom" ) {
-                // do setup here
-            }
-*/
-             validStateCount++;
+            validStateCount++;
         }
     
         if( validStateCount > 0 ) {
@@ -101,7 +93,13 @@ class AdventureManager {
             this.checkPlayerSprite();
             background(this.backgroundColor);
             this.states[this.currentState].draw();
+            //this.states[this.currentState].checkForCollision(this.playerSprite, this.collidedWithWall);
         }
+    }
+
+
+    collidedWithWall() {
+        print("collided!");
     }
 
     // move to interation table!
@@ -173,7 +171,12 @@ class AdventureManager {
     // 2nd param is a flag to bypass the comparison to currentStateNum, usually used at startup
     changeState(newStateStr, bypassComparison = false) {
         let newStateNum = this.getStateNumFromString(newStateStr);
-        print( "new state num = " + newStateNum);
+        this.changeStateByNum(newStateNum, bypassComparison);
+    }
+
+    // default is by string
+    changeStateByNum(newStateNum, bypassComparison = false) {
+        print( "passed new state num = " + newStateNum);
         if( newStateNum === -1 ) {
             print("can't find stateNum from string: " + newStateStr);
 
@@ -182,18 +185,26 @@ class AdventureManager {
             return;
         }
 
-        print("new state = " + newStateStr);
+        print("set new state = " + newStateNum);
 
         this.states[this.currentState].unload();
         this.states[newStateNum].load();
         this.currentState = newStateNum;
 
         // store new state name from states table
-        this.currentStateName = newStateStr;
+        this.currentStateName = this.getStateStrFromNum(newStateNum);
 
         if( this.clickableArray !== null && this.clickableTable !== null ) {
             this.changeButtonsVisibilityFromState(this.currentStateName);
         }
+    }
+
+    getNumStates() {
+        return this.statesTable.getRowCount();
+    }
+
+    getCurrentStateNum() {
+        return this.currentState;
     }
 
     getStateNumFromString(stateStr) {
@@ -205,6 +216,15 @@ class AdventureManager {
 
         // error!!
         return -1;
+    }
+
+    getStateStrFromNum(stateNum) {
+        return this.statesTable.getString(stateNum, 'StateName');
+    }
+
+    // returns class name of current state
+    getClassName() {
+        return this.statesTable.getString(this.currentState, 'ClassName');
     }
 
     checkPlayerSprite() {
@@ -292,6 +312,12 @@ class AdventureManager {
         }
     }
 
+    // returns the "short" filename (no precesing directory for the current state)
+    getPNGFilename() {
+        let longFilename = this.statesTable.getString(this.currentState, 'PNGFilename');
+        return longFilename.substring(longFilename.lastIndexOf('/')+1);
+    }
+
     // logic here is this (1) look at the clickables table to find the state name
     // (2) look for a match in the clickables array, (3) turn visibility on/off accordingly
     // EVERY clickable either has ONE state that corresponds to it or NO states
@@ -323,30 +349,40 @@ class AdventureManager {
                 print("set to hide");
             }
         }
-        
-        // (1) make sure column exists
-        // (2) go through table
-        // (3) for each entry, find index match in clickables
-/*
-               ID,Name,State,PNGFilename,Text,x,y,visible
-0,StartGame,Instructions,,Start Game,100,650,yes
-1,SelectAvatar,Instructions,,Select Avatar,300,650,yes
-2,Done,AvatarSelection,,Done,500,650,yes
-*/
     }
 }
 
 
 class PNGRoom {
     constructor() {
-        this.image = null;
+        // Image stuff
         this.imagePath = null;
+        this.image = null;
+
+        // collision stuff
+        this.collisionTable = null;
+        this.collisionX = [];
+        this.collisionY = [];
+        this.collisionWidth = [];
+        this.collisionHeight = [];
+        this.collisionSprites = [];
+        this.collisionGroup = null;
+
+        // flag for first-time load for collision table proper loading
+        this.loaded = false;
     }
 
-    setup(_imagePath) {
-        this.imagePath = String(_imagePath);
-    }
+    // filepath to PNG is 1st variable
+    // file to collision CSV is 2nd variable (may be empty string)
+    setup(_imagePath, _collisionPath = "") {
+        this.imagePath = _imagePath;
 
+        if( _collisionPath !== "" ) {
+            this.collisionTable = loadTable(_collisionPath, 'csv', 'header');
+            this.output("collision table = " + _collisionPath, " load " + this.collisionTable);
+        }
+    }
+    
     // empty, sublcasses can override
     preload() {
        
@@ -354,6 +390,25 @@ class PNGRoom {
 
     load() {
         this.image = loadImage(this.imagePath);
+
+        // this loads the collision table, we use the flag b/c loadTable needs
+        // time to load the data and won't work properly for a few cycles
+        if( this.loaded === false ) {
+            // load the collisions
+            if( this.collisionTable !== null) { 
+                this.output("collision table row count = " + this.collisionTable.getRowCount());
+                for( let i = 0; i < this.collisionTable.getRowCount(); i++ ) {
+                    this.collisionX[i] = this.collisionTable.getString(i, 'X');
+                    this.collisionY[i] = this.collisionTable.getString(i, 'Y');
+                    this.collisionWidth[i] = this.collisionTable.getString(i, 'Width');
+                    this.collisionHeight[i] = this.collisionTable.getString(i, 'Height');
+                }
+            }
+
+            this.createCollisionSprites();
+
+            this.loaded = true; 
+        }
     }
 
     unload() {
@@ -369,16 +424,64 @@ class PNGRoom {
         push();
         imageMode(CENTER);
         image(this.image,width/2,height/2);
+
+        //imageMode(CORNER);
+        fill(255,0,0);
+        for( let i = 0; i < this.collisionSprites.length; i++ ) {
+           drawSprite(this.collisionSprites[i]);
+           //rect(collisionX[i],collisionY[i],collisionWidth[i],collisionHeight[i]);
+        }
+
         pop();
+
+       // drawSprites();
+       
+    }
+
+    // ps = player sprite
+    // callbackFunction = callbackFunction
+    checkForCollision(ps, callbackFunction) {
+        if( ps !== null && this.collisionGroup !== null ) {
+            // for( let i = 0; i < this.collisionSprites.length; i++ ) {
+            //     //drawSprite(this.collisionSprites[i]);
+
+            // }
+            ps.overlap(this.collisionGroup, this.die);
+         // checks for overlap with ANY sprite in the group, if this happens
+        } 
+    }
+
+    die() {
+        print("die");
+    }
+    
+    // output to DebugScreen or console window, if we have no debug object
+    output(s) {
+        print(s);
+    }
+
+    //-- INTERNAL FUNCTIONS --//
+    createCollisionSprites() {
+        this.collisionGroup = new Group;
+
+        for( let i = 0; i < this.collisionX.length; i++ ) {
+           print( "row: " + i)
+            print(" [x] " + this.collisionX[i] );
+             print(" [y] " + this.collisionY[i] );
+             print(" [width] " + this.collisionWidth[i] );
+            print(" [height] " + this.collisionHeight[i] );
+            
+            this.collisionSprites[i] = createSprite( this.collisionX[i], this.collisionY[i], this.collisionWidth[i], this.collisionHeight[i] ); 
+              //this.collisionSprites[i].addAnimation('regular', loadAnimation('assets/avatars/bubbly0001.png', 'assets/avatars/bubbly0004.png') );
+
+              print( this.collisionSprites[i]);
+            // add to the group
+            this.collisionGroup.add(this.collisionSprites[i]);
+        }
+
     }
 }
 
-class MazeRoom extends PNGRoom {
-    constructor() {
-        super();
-        this.image = null;
-        this.imagePath = null;
-    }
-}
+
 
 
