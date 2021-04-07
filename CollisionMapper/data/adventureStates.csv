@@ -1,4 +1,4 @@
 StateName,ClassName,PNGFilename,CollisionFilename
-Rock,PNGRoom,assets/rockMaze.png,assets/rockMaze_cl.csv
+Rock,PNGRoom,assets/rockMaze.png,
 Corn,PNGRoom,assets/cornMaze.png,
 Scribble,PNGRoom,assets/scribbleMaze.png,assets/scribbleMaze_cl.csv

@@ -54,8 +54,8 @@ You can always use a text editor to edit this, or a spreadsheet and export to CS
 ##### Using for your Adventure
 To be added
 
-## ToDo
-** Fix 1st state not working bug
+## Known issues
+** 1st screen won't display the collision rects, need to go to Next and then Previous for it to display properly
 
 
 ## License
