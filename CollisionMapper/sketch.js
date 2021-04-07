@@ -366,6 +366,17 @@ function addCollisionRect(x1, y1, x2, y2) {
   collisionSY[nextOffset] = y1;
   collisionEX[nextOffset] = x2;
   collisionEY[nextOffset] = y2;
+  
+  updateRoom();
+}
+
+// update room with our collision rects
+function updateRoom() {
+  roomObj = adventureManager.states[adventureManager.getCurrentStateNum()];
+  roomObj.collisionSX = collisionSX;
+  roomObj.collisionSY = collisionSY;
+  roomObj.collisionEX = collisionEX;
+  roomObj.collisionEY = collisionEY;
 }
 
 // forces a save into downloads directory
@@ -406,6 +417,8 @@ function deleteSelectedRect() {
   if(  selectedRectIndex >= collisionSX.length ) {
     selectedRectIndex = collisionSX.length-1;
   }
+
+  updateRoom();
 }
 
 function updateStateNum(newStateNum) {
