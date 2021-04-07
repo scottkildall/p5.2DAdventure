@@ -52,9 +52,38 @@ You can always use a text editor to edit this, or a spreadsheet and export to CS
 (6) Clear your browser caches and edit your file
 
 ##### Using for your Adventure
-To be added
 
-## Known issues
+(1) Copy all your Room assets to the assets folder. You shoudn't need any other assets, as we will just be using the rooms and no other interactivity code.
+
+Please leave the bubbly avatar in the avatars folder.
+
+![](ReadMeImages/fileList.png) 
+
+(2) Copy your adventureStates.csv file to the data directory, replacing the existing one (this is why we work with a **copy**)
+
+
+![](ReadMeImages/copiedAdventureStates.png) 
+
+(3) Edit your adventureStates.csv to make sure all the class names fields say PNGRoom. We do this because since we are using only code in the AdventureManager and CollisionMapper, not any of your custom code
+
+
+![](ReadMeImages/classChange.png) 
+
+(4) Launch the localhost, clear your cache, run the JavaScript console window and cycle through the rooms with the CollisionMapper.
+
+If there are any errors, they should show up in the JavaScript console window and are likely one of two things:
+
+(a) you didn't copy the room PNG assets into the assets folder
+
+(b) you didn't change the class names to PNGRoom
+
+(5) With just ONE ROOM and a simple example, repeat steps 2-5 in the Getting Used to the Environment.
+
+Keep your JavaScript console window open, looking for errors.
+
+(6) Once you get the hang of it, you can do more than one room at a time, but start with just ONE room at a time for the first couple of rooms.
+
+## Known issues 
 ** 1st screen won't display the collision rects, need to go to Next and then Previous for it to display properly
 
 
