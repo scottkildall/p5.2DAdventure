@@ -276,16 +276,7 @@ class InstructionsScreen extends PNGRoom {
 class DeepThoughtsRoom extends PNGRoom {
   // preload() gets called once upon startup
   // We load ONE animation and create 20 NPCs
-  // 
   preload() {
-    // turn off buttons
-    for( let i = answer1Index; i <= answer6Index; i++ ) {
-     clickables[i].visible = false;
-    }
-
-    // this will be loaded when we enter the room
-    this.talkBubble = null;
-
      // load the animation just one time
     this.NPCAnimation = loadAnimation('assets/NPCs/coronaMine_01.png', 'assets/NPCs/coronaMine_04.png');
     
@@ -327,7 +318,7 @@ class DeepThoughtsRoom extends PNGRoom {
     this.NPCgroup.draw();
 
     // checks for overlap with ANY sprite in the group, if this happens
-    // our class's die() function gets called
+    // our die() function gets called
     playerSprite.overlap(this.NPCgroup, die);
 
     for( let i = 0; i < this.NPCSprites.length; i++ ) {

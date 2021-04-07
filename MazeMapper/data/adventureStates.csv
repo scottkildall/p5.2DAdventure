@@ -1,6 +1,0 @@
-StateName,ClassName,PNGFilename,CollisionFilename
-Atari,PNGRoom,assets/atariMaze.png,
-Corn,PNGRoom,assets/cornMaze.png,
-Rock,PNGRoom,assets/rockMaze.png,
-Scribble,PNGRoom,assets/scribbleMaze.png,assets/scribbleMaze_cl.csv
-Calm,PNGRoom,assets/Calm.png,assets/Calm_cl.csv
