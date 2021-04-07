@@ -336,7 +336,7 @@ function addCollisionRect(x1, y1, x2, y2) {
     x2 = temp;
   }
 
-  if( y1 > y1 ) {
+  if( y1 > y2 ) {
     temp = y1;
     y1 = y2;
     y2 = temp;

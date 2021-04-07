@@ -29,7 +29,7 @@ If you start drawing and don't like the rectangle you've made, you can press ESC
 
 It should look something like this. The avatar should also not be able to get past the selected areas.
 
-Right now, there is a BUG where, you have to draw from the upper-left corner to the bottom right corner when drawing the rects, but I will fix this soon. Be patient with the glitches!
+Be patient with the glitches! And let me know if there are any problems.
 
 ![](ReadMeImages/cornMaze.png) 
 
@@ -56,7 +56,7 @@ To be added
 
 ## ToDo
 ** Fix 1st state not working bug
-** Fix draw rect from bottom-right bug
+
 
 ## License
 CC BY: This license allows reusers to distribute, remix, adapt, and build upon the material in any medium or format, so long as attribution is given to the creator. The license allows for commercial use.
