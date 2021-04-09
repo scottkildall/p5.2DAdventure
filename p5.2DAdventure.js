@@ -463,6 +463,12 @@ class PNGRoom {
             
         //     this.loaded = true; 
         // }
+
+        if( this.collisionTable !== null) { 
+            print( "load() for: " + this.stateName );
+            print("Collision table row count = " + this.collisionTable.getRowCount());
+        }
+
     }
 
     unload() {
