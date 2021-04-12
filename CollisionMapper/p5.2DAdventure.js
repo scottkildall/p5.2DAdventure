@@ -189,9 +189,10 @@ class AdventureManager {
     changeStateByNum(newStateNum, bypassComparison = false) {
         print( "passed new state num = " + newStateNum);
         if( newStateNum === -1 ) {
-            print("can't find stateNum from string: " + newStateStr);
-
+            print("invalid statenum, exiting");
+            return;
         }
+
         if( bypassComparison === false && this.currentState === newStateNum ) {
             return;
         }
@@ -226,6 +227,7 @@ class AdventureManager {
         }
 
         // error!!
+        print( "Can't find stateStr, " + stateStr);
         return -1;
     }
 
@@ -463,6 +465,12 @@ class PNGRoom {
             
         //     this.loaded = true; 
         // }
+
+        if( this.collisionTable !== null) { 
+            print( "load() for: " + this.stateName );
+            print("Collision table row count = " + this.collisionTable.getRowCount());
+        }
+
     }
 
     unload() {
