@@ -12,12 +12,7 @@ What this will allow you to do is to create complex graphics and offload the man
 
 
 ## ToDo
-** change state callbacks for transitions
-
-** Finish maze mapper with collision rects + instructions
-
 ** keycode navigation not yet implemented
-
 ** documentation on creating sublcasses
 
 ## Errors in 2DAdventure
@@ -207,6 +202,33 @@ This is the clickable callback functon. It will pass **the name** of the clickab
 	  adventureManager.clickablePressed(this.name);
 	} 
   
+
+**setChangedStateCallback(callbackFunction)** sets a callback function for when a you change to a new state. This gets called in the draw() function when the state is changed, but before load() and unload() happens.
+
+
+
+	// do this in setup(). 
+	// changedState is the name of a callback function
+	adventureManager.setChangedStateCallback(changedState);
+	
+	
+
+
+
+The callback function should be in your sketch.js code, like this:
+
+
+
+
+
+	function changedState(currentStateStr, newStateStr) {
+		print("changedState callback:");
+		print("current state = " + currentStateStr);
+		print("new state = " + newStateStr);
+	} 
+  
+  
+
 
 ## License
 CC BY: This license allows reusers to distribute, remix, adapt, and build upon the material in any medium or format, so long as attribution is given to the creator. The license allows for commercial use.

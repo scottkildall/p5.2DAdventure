@@ -76,6 +76,7 @@ function setup() {
     // This will load the images, go through state and interation tables, etc
   adventureManager.setup();
 
+  adventureManager.setChangedStateCallback(changedState);
   // call OUR function to setup additional information about the p5.clickables
   // that are not in the array 
   setupClickables(); 
@@ -129,6 +130,12 @@ function keyPressed() {
 
 function mouseReleased() {
   adventureManager.mouseReleased();
+}
+
+//-------------- CALLBACK FUNCTION FOR WHEN STATE HAS CHANGED -------//
+function changedState(currentStateStr, newStateStr) {
+  print("changed state" + "current state = " + currentStateStr + " new state = " + newStateStr);
+
 }
 
 //-------------- YOUR SPRITE MOVEMENT CODE HERE  ---------------//
