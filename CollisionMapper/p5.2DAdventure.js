@@ -308,16 +308,16 @@ class AdventureManager {
 
     adjustSpriteForRoom() {
         if( this.playerSprite.position.x < -1 ) {
-            playerSprite.position.x = width;
+            this.playerSprite.position.x = width;
         }
         else if( this.playerSprite.position.x > width ) {
-            playerSprite.position.x = 0;
+            this.playerSprite.position.x = 0;
         }
         else if( this.playerSprite.position.y < -1 ) {
-            playerSprite.position.y = height;
+            this.playerSprite.position.y = height;
         }
         else if( this.playerSprite.position.y > height ) {
-            playerSprite.position.y = 0;
+            this.playerSprite.position.y = 0;
         }
     }
 
