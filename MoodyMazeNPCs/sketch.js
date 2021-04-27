@@ -277,63 +277,34 @@ class InstructionsScreen extends PNGRoom {
   }
 }
 
-// In the FeedMeRoom, you have a number of NPCs. We'll eventually make them
-// moving, but for now, they are static. If you run into the NPC, you
-// "die" and get teleported back to Start
-class DeepThoughtsRoom extends PNGRoom {
+// A template for creating sublclasses
+class levelOneBasicNeedsRoom extends PNGRoom {
   // preload() gets called once upon startup
   // We load ONE animation and create 20 NPCs
   preload() {
-     // load the animation just one time
-    this.NPCAnimation = loadAnimation('assets/NPCs/coronaMine_01.png', 'assets/NPCs/coronaMine_04.png');
     
-    // this is a type from p5play, so we can do operations on all sprites
-    // at once
-    this.NPCgroup = new Group;
-
-    // change this number for more or less
-    this.numNPCs = 30;
-
-    // is an array of sprites, note we keep this array because
-    // later I will add movement to all of them
-    this.NPCSprites = [];
-
-    // this will place them randomly in the room
-    for( let i = 0; i < this.numNPCs; i++ ) {
-      // random x and random y poisiton for each sprite
-      let randX  = random(100, width-100);
-      let randY = random(100, height-100);
-
-      // create the sprite
-      this.NPCSprites[i] = createSprite( randX, randY, 40, 40);
-    
-      // add the animation to it (important to load the animation just one time)
-      this.NPCSprites[i].addAnimation('regular', this.NPCAnimation );
-
-      // add to the group
-      this.NPCgroup.add(this.NPCSprites[i]);
-    }
   }
 
+  // load() gets called whenever you enter a room
+  load() {
+     super.load();
+  }
   
   // pass draw function to superclass, then draw sprites, then check for overlap
   draw() {
     // PNG room draw
     super.draw();
 
-    // draws all the sprites in the group
-    this.NPCgroup.draw();
+    // draw our dialog box here...
+  }
 
-    // checks for overlap with ANY sprite in the group, if this happens
-    // our die() function gets called
-    playerSprite.overlap(this.NPCgroup, die);
-
-    for( let i = 0; i < this.NPCSprites.length; i++ ) {
-      this.NPCSprites[i].velocity.x = random(-1,1);
-      this.NPCSprites[i].velocity.y = random(-1,1);
-    }
+  // gets called when you leave a room
+  unload()  {
+      super.unload();
   }
 }
+
+
 
 class AhaRoom extends PNGRoom {
   // preload() gets called once upon startup
